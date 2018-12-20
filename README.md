@@ -10,4 +10,4 @@ This package provides the necessary base code to start the developing a package 
 * Select `Skeleton Package` from the administrative sidebar
 
 ## Uninstall
-* Use `composer remove processmaker/bpm-package-g-suite-auth` to remove the package completely
+* Use `composer remove processmaker/bpm-package-skeleton` to remove the package completely
