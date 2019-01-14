@@ -3,7 +3,7 @@ namespace ProcessMaker\Package\PackageSkeleton;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use ProcessMaker\Events\PackageEvent;
+use ProcessMaker\Package\Packages\Events\PackageEvent;
 use ProcessMaker\Package\PackageSkeleton\Http\Middleware\AddToMenus;
 use ProcessMaker\Package\PackageSkeleton\Listeners\PackageListener;
 

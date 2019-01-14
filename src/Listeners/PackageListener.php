@@ -4,7 +4,7 @@ namespace ProcessMaker\Package\PackageSkeleton\Listeners;
 
 use Carbon\Carbon;
 use DateTime;
-use ProcessMaker\Events\PackageEvent;
+use ProcessMaker\Package\Packages\Events\PackageEvent;
 
 class PackageListener
 {
@@ -17,7 +17,7 @@ class PackageListener
      */
     public function handle(PackageEvent $event){
         $composer = json_decode(file_get_contents(__DIR__ . '/../../composer.json'), true);
-        $expire_in = null;
+        $expires_on = null;
         if (ioncube_file_info())
             $expires_on = Carbon::createFromTimestamp(ioncube_file_info()['FILE_EXPIRY'], config('app.timezone'))->format(DateTime::ISO8601);
 
