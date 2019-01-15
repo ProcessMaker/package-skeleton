@@ -1,5 +1,5 @@
 {
-    "name": "processmaker/bpm-package-skeleton",
+    "name": "processmaker/pm4-package-skeleton",
     "friendly_name": "Package Skeleton",
     "description": "Package skeleton to start a develop in ProcessMaker 4",
     "version": "0.0.1",
