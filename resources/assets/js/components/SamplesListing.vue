@@ -21,7 +21,7 @@
 
 
 <script>
-    import datatableMixin from "../../../../../../resources/js/components/common/mixins/datatable";
+    import datatableMixin from "../../../../../../../resources/js/components/common/mixins/datatable";
 
     export default {
         mixins: [datatableMixin],
