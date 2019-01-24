@@ -11,7 +11,8 @@
         }
     ],
     "require": {
-        "processmaker/bpm": "4.0.*"
+        "processmaker/bpm": "4.0.*",
+        "processmaker/pm4-packages": "*"
     },
     "autoload": {
         "psr-4": {
