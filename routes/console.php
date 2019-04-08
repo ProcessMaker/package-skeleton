@@ -1,6 +1,6 @@
 <?php
 use Illuminate\Support\Facades\Schema;
-Artisan::command('pm4-package-skeleton:install', function () {
+Artisan::command('spark-package-skeleton:install', function () {
     if (!Schema::hasTable('sample_skeleton')) {
         Schema::create('sample_skeleton', function (Illuminate\Database\Schema\Blueprint $table) {
             $table->increments('id');
@@ -10,7 +10,7 @@ Artisan::command('pm4-package-skeleton:install', function () {
         });
     }
     Artisan::call('vendor:publish', [
-        '--tag' => 'bpm-package-skeleton',
+        '--tag' => 'spark-package-skeleton',
         '--force' => true
     ]);
 

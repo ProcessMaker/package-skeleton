@@ -88,7 +88,7 @@
                             "",
                             () => {
                                 ProcessMaker.apiClient
-                                    .delete("admin/bpm-package-skeleton/" + data.id)
+                                    .delete("admin/spark-package-skeleton/" + data.id)
                                     .then(response => {
                                         ProcessMaker.alert("Sample " + data.name + " has been deleted", "warning");
                                         this.$emit("reload");
@@ -105,7 +105,7 @@
                 // Load from our api client
                 ProcessMaker.apiClient
                     .get(
-                        "admin/bpm-package-skeleton/fetch?page=" +
+                        "admin/spark-package-skeleton/fetch?page=" +
                         this.page +
                         "&per_page=" +
                         this.perPage +

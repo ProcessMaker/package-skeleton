@@ -1,7 +1,7 @@
 const { mix } = require('laravel-mix');
 
 /*
-Your BPM Plugin webpack utilizes laravel mix in order to easily compile 
+Your Spark Plugin webpack utilizes laravel mix in order to easily compile 
 your static resources.  Refer to the Laravel Mix documentation at 
 https://laravel.com/docs/5.6/mix for information on how to configure 
 mix to compile additional resources. 

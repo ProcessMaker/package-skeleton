@@ -1,8 +1,8 @@
-# BPM Package Skeleton
+# Spark Package Skeleton
 This package provides the necessary base code to start the developing a package in ProcessMaker 4.
 
 ## Installation
-* Use `composer require processmaker/pm4-package-skeleton` to install the package.
+* Use `composer require processmaker/spark-package-skeleton` to install the package.
 * Use `php artisan package-skeleton:install` to install generate the dependencies.
 
 ## Navigation and testing
@@ -11,4 +11,4 @@ This package provides the necessary base code to start the developing a package 
 
 ## Uninstall
 * Use `php artisan package-skeleton:uninstall` to uninstall the package
-* Use `composer remove processmaker/pm4-package-skeleton` to remove the package completely
+* Use `composer remove processmaker/spark-package-skeleton` to remove the package completely

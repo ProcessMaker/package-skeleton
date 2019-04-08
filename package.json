@@ -1,10 +1,10 @@
 {
-  "name": "bpm-package-skeleton",
+  "name": "spark-package-skeleton",
   "version": "0.0.1",
-  "description": "ProcessMaker BPM Package to support G Suite Authentication",
+  "description": "ProcessMaker Spark Package to support G Suite Authentication",
   "author": "DevOps <devops@processmaker.com>",
   "license": "ISC",
-  "homepage": "https://github.com/ProcessMaker/bpm-package-skeleton",
+  "homepage": "https://github.com/ProcessMaker/spark-package-skeleton",
   "scripts": {
     "dev": "npm run development",
     "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
