@@ -1,13 +1,13 @@
 {
-    "name": "processmaker/spark-package-skeleton",
-    "friendly_name": "Package Skeleton",
-    "description": "Package skeleton to start a develop in ProcessMaker 4",
+    "name": "processmaker/spark-package-vocabularies",
+    "friendly_name": "Package Vocabularies",
+    "description": "Package vocabularies for spark",
     "version": "0.0.1",
     "type": "project",
     "authors": [
         {
-            "name": "DevOps",
-            "email": "devops@processmaker.com"
+            "name": "Dante Loayza",
+            "email": "dante.loayza@processmaker.com"
         }
     ],
     "require": {
@@ -16,13 +16,13 @@
     },
     "autoload": {
         "psr-4": {
-            "ProcessMaker\\Package\\PackageSkeleton\\": "src"
+            "ProcessMaker\\Package\\PackageVocabularies\\": "src"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "ProcessMaker\\Package\\PackageSkeleton\\PackageServiceProvider"
+                "ProcessMaker\\Package\\PackageVocabularies\\PackageServiceProvider"
             ]
         }
     }
