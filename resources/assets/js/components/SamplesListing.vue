@@ -84,11 +84,11 @@
                     case "remove-item":
                         ProcessMaker.confirmModal(
                             "Caution!",
-                            "<b>Are you sure to inactive the sample </b>'" + data.name + "'?",
+                            "Are you sure to inactive the sample '" + data.name + "'?",
                             "",
                             () => {
                                 ProcessMaker.apiClient
-                                    .delete("admin/spark-package-skeleton/" + data.id)
+                                    .delete("admin/package-skeleton/" + data.id)
                                     .then(response => {
                                         ProcessMaker.alert("Sample " + data.name + " has been deleted", "warning");
                                         this.$emit("reload");
@@ -105,7 +105,7 @@
                 // Load from our api client
                 ProcessMaker.apiClient
                     .get(
-                        "admin/spark-package-skeleton/fetch?page=" +
+                        "admin/package-skeleton/fetch?page=" +
                         this.page +
                         "&per_page=" +
                         this.perPage +
