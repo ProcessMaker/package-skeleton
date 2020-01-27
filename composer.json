@@ -1,5 +1,5 @@
 {
-    "name": "processmaker/spark-package-skeleton",
+    "name": "processmaker/package-skeleton",
     "friendly_name": "Package Skeleton",
     "description": "Package skeleton to start a develop in ProcessMaker 4",
     "version": "0.0.1",
@@ -11,8 +11,8 @@
         }
     ],
     "require": {
-        "processmaker/spark": "4.0.*",
-        "processmaker/spark-packages": "*"
+        "processmaker/processmaker": "*",
+        "processmaker/packages": "*"
     },
     "autoload": {
         "psr-4": {
