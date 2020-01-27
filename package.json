@@ -1,7 +1,7 @@
 {
   "name": "package-skeleton",
   "version": "0.0.1",
-  "description": "ProcessMaker Package to support G Suite Authentication",
+  "description": "Package skeleton to start a develop in ProcessMaker 4",
   "author": "DevOps <devops@processmaker.com>",
   "license": "ISC",
   "homepage": "https://github.com/ProcessMaker/package-skeleton",
