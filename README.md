@@ -10,6 +10,7 @@ cd package-name
 php rename-project.php package-skeleton package-name
 composer install
 npm install
+npm run dev
 ```
 
 ## Installation
