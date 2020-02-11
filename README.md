@@ -5,9 +5,9 @@ This package provides the necessary base code to start the developing a package 
 If you need to create a new ProcessMaker package run the following commands:
 
 ```
-git clone https://github.com/ProcessMaker/package-skeleton.git package-name
-cd package-name
-php rename-project.php package-skeleton package-name
+git clone https://github.com/ProcessMaker/package-skeleton.git
+cd package-skeleton
+php rename-project.php package-skeleton
 composer install
 npm install
 npm run dev
