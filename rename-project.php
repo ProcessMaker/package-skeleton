@@ -1,6 +1,6 @@
 <?php
 
-//use => php rename-project.php string_search string_to_replace
+//use => php rename-project.php string_to_replace
 
 if (isset($argc)) {
     for ($i = 0; $i < $argc; $i++) {
@@ -12,11 +12,6 @@ if (isset($argc)) {
 }
 
 if (!isset($argv[1])) {
-    echo 'You need a parameter to perform the search...';
-    return;
-}
-
-if (!isset($argv[2])) {
     echo 'You need a parameter to perform the replacement...';
     return;
 }
@@ -49,11 +44,11 @@ function searchDirectoryFiles($path, $stringToReplace, $replaceWith)
     }
 }
 
-searchDirectoryFiles(getcwd() . '/', $argv[1], $argv[2]);
+searchDirectoryFiles(getcwd() . '/', 'package-skeleton', $argv[1]);
 
 if (is_dir(getcwd() . '/')) {
     echo "\n Rename Directory...";
-   rename(getcwd(), getcwd() . '/../' . $argv[2]);
+   rename(getcwd(), getcwd() . '/../' . $argv[1]);
 }
 
 
