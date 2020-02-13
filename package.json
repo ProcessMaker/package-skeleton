@@ -1,10 +1,10 @@
 {
-  "name": "spark-package-skeleton",
+  "name": "package-skeleton",
   "version": "0.0.1",
-  "description": "ProcessMaker Spark Package to support G Suite Authentication",
+  "description": "Package skeleton to start a develop in ProcessMaker 4",
   "author": "DevOps <devops@processmaker.com>",
   "license": "ISC",
-  "homepage": "https://github.com/ProcessMaker/spark-package-skeleton",
+  "homepage": "https://github.com/ProcessMaker/package-skeleton",
   "scripts": {
     "dev": "npm run development",
     "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@processmaker/vue-form-elements": "^0.2.3",
+    "bootstrap-vue": "^2.3.0",
     "datatables": "^1.10.18",
     "tooltip.js": "^1.2.0",
     "v-tooltip": "^2.0.0-rc.33",

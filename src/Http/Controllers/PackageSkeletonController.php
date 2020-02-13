@@ -12,7 +12,7 @@ use URL;
 class PackageSkeletonController extends Controller
 {
     public function index(){
-        return view('spark-package-skeleton::index');
+        return view('package-skeleton::index');
     }
 
     public function fetch(Request $request){

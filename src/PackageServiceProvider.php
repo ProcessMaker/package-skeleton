@@ -50,11 +50,11 @@ class PackageServiceProvider extends ServiceProvider
             Route::pushMiddlewareToGroup('web', AddToMenus::class);
         }
 
-        $this->loadViewsFrom(__DIR__ . '/../resources/views/', 'spark-package-skeleton');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views/', 'package-skeleton');
 
         $this->publishes([
-            __DIR__.'/../public' => public_path('vendor/processmaker/packages/spark-package-skeleton'),
-        ], 'spark-package-skeleton');
+            __DIR__.'/../public' => public_path('vendor/processmaker/packages/package-skeleton'),
+        ], 'package-skeleton');
 
         $this->app['events']->listen(PackageEvent::class, PackageListener::class);
 
