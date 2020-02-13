@@ -12,8 +12,8 @@ if (isset($argc)) {
 }
 
 if (!isset($argv[1])) {
-    echo 'You need a parameter to perform the replacement...';
-    return;
+    $argv[1] = basename(getcwd());
+    echo 'Name project: ' . $argv[1] . "\n";
 }
 
 function replaceStringInFile($filename, $stringToReplace, $replaceWith)
