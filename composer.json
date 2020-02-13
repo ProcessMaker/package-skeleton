@@ -1,7 +1,7 @@
 {
     "name": "processmaker/package-skeleton",
     "friendly_name": "Package Skeleton",
-    "description": "Package skeleton to start a develop in ProcessMaker 4",
+    "description": "Package skeleton to develop a package for ProcessMaker 4",
     "license": "GNU Affero General Public License version 3",
     "version": "0.0.1",
     "type": "project",
