@@ -1,7 +1,8 @@
 {
     "name": "processmaker/package-skeleton",
     "friendly_name": "Package Skeleton",
-    "description": "Package skeleton to start a develop in ProcessMaker 4",
+    "description": "Package skeleton to develop a package for ProcessMaker 4",
+    "license": "AGPL-3.0-or-later",
     "version": "0.0.1",
     "type": "project",
     "authors": [
