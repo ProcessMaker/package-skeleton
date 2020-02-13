@@ -23,5 +23,10 @@
                 "ProcessMaker\\Package\\PackageSkeleton\\PackageServiceProvider"
             ]
         }
+    },
+    "scripts": {
+        "post-create-project-cmd": [
+            "@php rename-project.php"
+        ]
     }
 }
