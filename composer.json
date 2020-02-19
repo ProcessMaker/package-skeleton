@@ -3,7 +3,7 @@
     "friendly_name": "Package Skeleton",
     "description": "Package skeleton to develop a package for ProcessMaker 4",
     "license": "AGPL-3.0-or-later",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "type": "project",
     "authors": [
         {
