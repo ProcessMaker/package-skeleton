@@ -44,14 +44,20 @@ function searchDirectoryFiles($path, $stringToReplace, $replaceWith)
     }
 }
 
-searchDirectoryFiles(getcwd() . '/', 'package-skeleton', $argv[1]);
+function dashesToCamelCase($string, $capitalizeFirstCharacter = false, $replace = '')
+{
 
-if (is_dir(getcwd() . '/')) {
-    echo "\n Rename Directory...";
-   rename(getcwd(), getcwd() . '/../' . $argv[1]);
+    $str = str_replace('-', $replace, ucwords($string, '-'));
+
+    if (!$capitalizeFirstCharacter) {
+        $str = lcfirst($str);
+    }
+
+    return $str;
 }
 
+searchDirectoryFiles(getcwd() . '/', 'package-skeleton', $argv[1]);
 
+searchDirectoryFiles(getcwd() . '/', 'PackageSkeleton', dashesToCamelCase($argv[1], true));
 
-
-
+searchDirectoryFiles(getcwd() . '/', 'Package Skeleton', dashesToCamelCase($argv[1], true, ' '));
