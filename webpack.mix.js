@@ -17,4 +17,11 @@ folder configured for publishing by default.
 mix.setPublicPath('public')
     .js('resources/js/package.js', 'js')
     .sass('resources/sass/package.scss', 'css')
-    .version();
+    .version()
+    .then(() => {
+        try {
+            require('./webpack.callback')();
+        } catch (e) {
+            //No callback found
+        }
+    });
