@@ -1,30 +1,30 @@
-<?php
-namespace ProcessMaker\Package\PackageSkeleton\Http\Middleware;
-
-use Closure;
-use Lavary\Menu\Facade as Menu;
-
-
-class AddToMenus
-{
-
-    public function handle($request, Closure $next)
-    {
-
-        // Add a menu option to the top to point to our page
-
-        $menu = Menu::get('topnav');
-        $menu->add(__('Skeleton'), ['route' => 'package.skeleton.tab.index']);
-
-        // Add a option in the admin menu to point to our page
-        $menu = Menu::get('sidebar_admin')->first();
-
-        // Add our menu item to the top nav
-        $menu->add(__('Skeleton'), [
-            'route' => 'package.skeleton.index',
-            'icon' => 'fa-puzzle-piece',
-        ]);
-        return $next($request);
-    }
-
-}
+<?php //004fb
+if(!extension_loaded('ionCube Loader')){$__oc=strtolower(substr(php_uname(),0,3));$__ln='ioncube_loader_'.$__oc.'_'.substr(phpversion(),0,3).(($__oc=='win')?'.dll':'.so');if(function_exists('dl')){@dl($__ln);}if(function_exists('_il_exec')){return _il_exec();}$__ln='/ioncube/'.$__ln;$__oid=$__id=realpath(ini_get('extension_dir'));$__here=dirname(__FILE__);if(strlen($__id)>1&&$__id[1]==':'){$__id=str_replace('\\','/',substr($__id,2));$__here=str_replace('\\','/',substr($__here,2));}$__rd=str_repeat('/..',substr_count($__id,'/')).$__here.'/';$__i=strlen($__rd);while($__i--){if($__rd[$__i]=='/'){$__lp=substr($__rd,0,$__i).$__ln;if(file_exists($__oid.$__lp)){$__ln=$__lp;break;}}}if(function_exists('dl')){@dl($__ln);}}else{die('The file '.__FILE__." is corrupted.\n");}if(function_exists('_il_exec')){return _il_exec();}echo("Site error: the ".(php_sapi_name()=='cli'?'ionCube':'<a href="http://www.ioncube.com">ionCube</a>')." PHP Loader needs to be installed. This is a widely used PHP extension for running ionCube protected PHP code, website security and malware blocking.\n\nPlease visit ".(php_sapi_name()=='cli'?'get-loader.ioncube.com':'<a href="http://get-loader.ioncube.com">get-loader.ioncube.com</a>')." for install assistance.\n\n");exit(199);
+?>
+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
+oW1GXFG8d9LDiG7VfxizfOPF4yi=

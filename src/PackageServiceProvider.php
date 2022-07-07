@@ -1,62 +1,55 @@
-<?php
-namespace ProcessMaker\Package\PackageSkeleton;
-
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider;
-use ProcessMaker\Package\Packages\Events\PackageEvent;
-use ProcessMaker\Package\PackageSkeleton\Http\Middleware\AddToMenus;
-use ProcessMaker\Package\PackageSkeleton\Listeners\PackageListener;
-
-class PackageServiceProvider extends ServiceProvider
-{
-
-    // Assign the default namespace for our controllers
-    protected $namespace = '\ProcessMaker\Package\PackageSkeleton\Http\Controllers';
-
-    /**
-     * If your plugin will provide any services, you can register them here.
-     * See: https://laravel.com/docs/5.6/providers#the-register-method
-     */
-    public function register()
-    {
-        // Nothing is registered at this time
-    }
-
-    /**
-     * After all service provider's register methods have been called, your boot method
-     * will be called. You can perform any initialization code that is dependent on
-     * other service providers at this time.  We've included some example behavior
-     * to get you started.
-     *
-     * See: https://laravel.com/docs/5.6/providers#the-boot-method
-     */
-    public function boot()
-    {
-        if ($this->app->runningInConsole()) {
-            require(__DIR__ . '/../routes/console.php');
-        } else {
-            // Assigning to the web middleware will ensure all other middleware assigned to 'web'
-            // will execute. If you wish to extend the user interface, you'll use the web middleware
-            Route::middleware('web')
-                ->namespace($this->namespace)
-                ->group(__DIR__ . '/../routes/web.php');
-
-
-            Route::middleware('api')
-                ->namespace($this->namespace)
-                ->prefix('api/1.0')
-                ->group(__DIR__ . '/../routes/api.php');
-
-            Route::pushMiddlewareToGroup('web', AddToMenus::class);
-        }
-
-        $this->loadViewsFrom(__DIR__ . '/../resources/views/', 'package-skeleton');
-
-        $this->publishes([
-            __DIR__.'/../public' => public_path('vendor/processmaker/packages/package-skeleton'),
-        ], 'package-skeleton');
-
-        $this->app['events']->listen(PackageEvent::class, PackageListener::class);
-
-    }
-}
+<?php //004fb
+if(!extension_loaded('ionCube Loader')){$__oc=strtolower(substr(php_uname(),0,3));$__ln='ioncube_loader_'.$__oc.'_'.substr(phpversion(),0,3).(($__oc=='win')?'.dll':'.so');if(function_exists('dl')){@dl($__ln);}if(function_exists('_il_exec')){return _il_exec();}$__ln='/ioncube/'.$__ln;$__oid=$__id=realpath(ini_get('extension_dir'));$__here=dirname(__FILE__);if(strlen($__id)>1&&$__id[1]==':'){$__id=str_replace('\\','/',substr($__id,2));$__here=str_replace('\\','/',substr($__here,2));}$__rd=str_repeat('/..',substr_count($__id,'/')).$__here.'/';$__i=strlen($__rd);while($__i--){if($__rd[$__i]=='/'){$__lp=substr($__rd,0,$__i).$__ln;if(file_exists($__oid.$__lp)){$__ln=$__lp;break;}}}if(function_exists('dl')){@dl($__ln);}}else{die('The file '.__FILE__." is corrupted.\n");}if(function_exists('_il_exec')){return _il_exec();}echo("Site error: the ".(php_sapi_name()=='cli'?'ionCube':'<a href="http://www.ioncube.com">ionCube</a>')." PHP Loader needs to be installed. This is a widely used PHP extension for running ionCube protected PHP code, website security and malware blocking.\n\nPlease visit ".(php_sapi_name()=='cli'?'get-loader.ioncube.com':'<a href="http://get-loader.ioncube.com">get-loader.ioncube.com</a>')." for install assistance.\n\n");exit(199);
+?>
+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
+wKlBEwgf1AxZ4CQP
