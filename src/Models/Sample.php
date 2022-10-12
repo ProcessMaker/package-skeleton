@@ -2,13 +2,13 @@
 
 namespace ProcessMaker\Package\PackageSkeleton\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use ProcessMaker\Models\ProcessMakerModel;
 
-class Sample extends Model
+class Sample extends ProcessMakerModel
 {
     protected $table = 'sample_skeleton';
 
     protected $fillable = [
-        'id', 'name', 'status'
+        'id', 'name', 'status',
     ];
 }
