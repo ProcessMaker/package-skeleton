@@ -15,7 +15,8 @@
     },
     "autoload": {
         "psr-4": {
-            "ProcessMaker\\Package\\PackageSkeleton\\": "src"
+            "ProcessMaker\\Package\\PackageSkeleton\\": "src",
+            "Tests\\": "tests/"
         }
     },
     "extra": {
