@@ -3,7 +3,6 @@
 namespace ProcessMaker\Package\PackageSkeleton\Console\Commands;
 
 use Artisan;
-use Illuminate\Console\Command;
 use ProcessMaker\Console\PackageInstallCommand;
 
 class Install extends PackageInstallCommand
