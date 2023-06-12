@@ -56,8 +56,24 @@ function dashesToCamelCase($string, $capitalizeFirstCharacter = false, $replace 
     return $str;
 }
 
-searchDirectoryFiles(getcwd() . '/', 'package-skeleton', $argv[1]);
+function replaceInstallCommand($string)
+{
+    $path = 'src/Console/Commands/';
+    $file = 'Install.php';
+    $stringToReplace = '{package-name}';
+    $stringToReplaceHuman = '{package-name-human}';
+    $replaceWith = $string;
+    $replaceWithForHuman = $str = str_replace('-', ' ', ucwords($string));
 
-searchDirectoryFiles(getcwd() . '/', 'PackageSkeleton', dashesToCamelCase($argv[1], true));
+    replaceStringInFile($path . $file, $stringToReplace, $replaceWith);
+    replaceStringInFile($path . $file, $stringToReplaceHuman, $replaceWithForHuman);
+}
 
-searchDirectoryFiles(getcwd() . '/', 'Package Skeleton', dashesToCamelCase($argv[1], true, ' '));
+searchDirectoryFiles(getcwd() . '/', 'package-ai', $argv[1]);
+
+searchDirectoryFiles(getcwd() . '/', 'PackageAi', dashesToCamelCase($argv[1], true));
+
+searchDirectoryFiles(getcwd() . '/', 'Package Ai', dashesToCamelCase($argv[1], true, ' '));
+
+replaceInstallCommand($argv[1]);
+
