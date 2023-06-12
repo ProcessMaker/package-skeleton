@@ -56,10 +56,9 @@ function dashesToCamelCase($string, $capitalizeFirstCharacter = false, $replace 
     return $str;
 }
 
-function replaceInstallCommand($string)
+function replaceNameInCommands($file, $string)
 {
     $path = 'src/Console/Commands/';
-    $file = 'Install.php';
     $stringToReplace = '{package-name}';
     $stringToReplaceHuman = '{package-name-human}';
     $replaceWith = $string;
@@ -75,5 +74,6 @@ searchDirectoryFiles(getcwd() . '/', 'PackageAi', dashesToCamelCase($argv[1], tr
 
 searchDirectoryFiles(getcwd() . '/', 'Package Ai', dashesToCamelCase($argv[1], true, ' '));
 
-replaceInstallCommand($argv[1]);
+replaceNameInCommands($argv[1], 'Install.php');
+replaceNameInCommands($argv[1], 'Uninstall.php');
 
