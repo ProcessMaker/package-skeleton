@@ -1,5 +1,5 @@
 <?php
-namespace Tests\PackageAi;
+namespace Tests\PackageSkeleton;
 
 use Tests\TestCase;
 
