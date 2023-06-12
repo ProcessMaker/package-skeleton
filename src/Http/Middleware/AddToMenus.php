@@ -1,5 +1,5 @@
 <?php
-namespace ProcessMaker\Package\PackageSkeleton\Http\Middleware;
+namespace ProcessMaker\Package\PackageAi\Http\Middleware;
 
 use Closure;
 use Lavary\Menu\Facade as Menu;

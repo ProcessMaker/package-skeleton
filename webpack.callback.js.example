@@ -3,7 +3,7 @@ const { exec } = require('child_process');
 module.exports = function () {
     exec("export VAGRANT_CWD='~/sites/processmaker' && \
           vagrant ssh -c 'php processmaker/artisan vendor:publish \
-          --tag=package-skeleton \
+          --tag=package-ai \
           --force'",
         (err, stdout, stderr) => {
             if (!err) {

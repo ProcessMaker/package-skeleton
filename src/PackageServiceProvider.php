@@ -1,17 +1,17 @@
 <?php
-namespace ProcessMaker\Package\PackageSkeleton;
+namespace ProcessMaker\Package\PackageAi;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use ProcessMaker\Package\Packages\Events\PackageEvent;
-use ProcessMaker\Package\PackageSkeleton\Http\Middleware\AddToMenus;
-use ProcessMaker\Package\PackageSkeleton\Listeners\PackageListener;
+use ProcessMaker\Package\PackageAi\Http\Middleware\AddToMenus;
+use ProcessMaker\Package\PackageAi\Listeners\PackageListener;
 
 class PackageServiceProvider extends ServiceProvider
 {
 
     // Assign the default namespace for our controllers
-    protected $namespace = '\ProcessMaker\Package\PackageSkeleton\Http\Controllers';
+    protected $namespace = '\ProcessMaker\Package\PackageAi\Http\Controllers';
 
     /**
      * If your plugin will provide any services, you can register them here.
@@ -32,6 +32,11 @@ class PackageServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+         //Register commands
+         $this->commands([
+            Console\Commands\Install::class,
+        ]);
+
         if ($this->app->runningInConsole()) {
             require(__DIR__ . '/../routes/console.php');
         } else {
@@ -50,11 +55,11 @@ class PackageServiceProvider extends ServiceProvider
             Route::pushMiddlewareToGroup('web', AddToMenus::class);
         }
 
-        $this->loadViewsFrom(__DIR__ . '/../resources/views/', 'package-skeleton');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views/', 'package-ai');
 
         $this->publishes([
-            __DIR__.'/../public' => public_path('vendor/processmaker/packages/package-skeleton'),
-        ], 'package-skeleton');
+            __DIR__.'/../public' => public_path('vendor/processmaker/packages/package-ai'),
+        ], 'package-ai');
 
         $this->app['events']->listen(PackageEvent::class, PackageListener::class);
 

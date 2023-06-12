@@ -1,6 +1,6 @@
 <?php
 
-namespace ProcessMaker\Package\PackageSkeleton\Models;
+namespace ProcessMaker\Package\PackageAi\Models;
 
 use ProcessMaker\Models\ProcessMakerModel;
 
