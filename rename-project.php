@@ -74,6 +74,6 @@ searchDirectoryFiles(getcwd() . '/', 'PackageAi', dashesToCamelCase($argv[1], tr
 
 searchDirectoryFiles(getcwd() . '/', 'Package Ai', dashesToCamelCase($argv[1], true, ' '));
 
-replaceNameInCommands($argv[1], 'Install.php');
-replaceNameInCommands($argv[1], 'Uninstall.php');
+replaceNameInCommands('Install.php', $argv[1]);
+replaceNameInCommands('Uninstall.php', $argv[1]);
 
