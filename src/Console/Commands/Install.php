@@ -19,7 +19,7 @@ class Install extends PackageInstallCommand
      *
      * @var string
      */
-    protected $description = 'Install PackageSkeleton Package';
+    protected $description = 'Install Package Skeleton Package';
 
     /**
      * Publish assets
@@ -55,7 +55,7 @@ class Install extends PackageInstallCommand
     public function handle()
     {
         parent::handle();
-        $this->info('PackageSkeleton has been installed');
+        $this->info('Package Skeleton has been installed');
 
     }
 }

@@ -60,4 +60,4 @@ searchDirectoryFiles(getcwd() . '/', 'package-skeleton', $argv[1]);
 
 searchDirectoryFiles(getcwd() . '/', 'PackageSkeleton', dashesToCamelCase($argv[1], true));
 
-searchDirectoryFiles(getcwd() . '/', 'package-skeleton', dashesToCamelCase($argv[1], true, ' '));
+searchDirectoryFiles(getcwd() . '/', 'Package Skeleton', dashesToCamelCase($argv[1], true, ' '));

@@ -18,7 +18,7 @@ class Uninstall extends Command
      *
      * @var string
      */
-    protected $description = 'Uninstall PackageSkeleton Package';
+    protected $description = 'Uninstall Package Skeleton Package';
 
     /**
      * Execute the console command.
@@ -27,6 +27,6 @@ class Uninstall extends Command
      */
     public function handle()
     {
-        $this->info('PackageSkeleton package Uninstalled');
+        $this->info('Package Skeleton package Uninstalled');
     }
 }
