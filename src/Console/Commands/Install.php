@@ -12,14 +12,14 @@ class Install extends PackageInstallCommand
      *
      * @var string
      */
-    protected $signature = '{package-name}:install';
+    protected $signature = 'package-skeleton:install';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Install {package-name-human} Package';
+    protected $description = 'Install PackageSkeleton Package';
 
     /**
      * Publish assets
@@ -29,7 +29,7 @@ class Install extends PackageInstallCommand
     {
         $this->info('Publishing assets');
         Artisan::call('vendor:publish', [
-            '--tag' => '{package-name}',
+            '--tag' => 'package-skeleton',
             '--force' => true,
         ]);
     }
@@ -55,7 +55,7 @@ class Install extends PackageInstallCommand
     public function handle()
     {
         parent::handle();
-        $this->info('{package-name-human} has been installed');
+        $this->info('PackageSkeleton has been installed');
 
     }
 }

@@ -56,24 +56,10 @@ function dashesToCamelCase($string, $capitalizeFirstCharacter = false, $replace 
     return $str;
 }
 
-function replaceNameInCommands($file, $string)
-{
-    $path = 'src/Console/Commands/';
-    $stringToReplace = '{package-name}';
-    $stringToReplaceHuman = '{package-name-human}';
-    $replaceWith = $string;
-    $replaceWithForHuman = $str = str_replace('-', ' ', ucwords($string));
+searchDirectoryFiles(getcwd() . '/', 'package-skeleton', $argv[1]);
 
-    replaceStringInFile($path . $file, $stringToReplace, $replaceWith);
-    replaceStringInFile($path . $file, $stringToReplaceHuman, $replaceWithForHuman);
-}
+searchDirectoryFiles(getcwd() . '/', 'PackageSkeleton', dashesToCamelCase($argv[1], true));
 
-searchDirectoryFiles(getcwd() . '/', 'package-ai', $argv[1]);
+searchDirectoryFiles(getcwd() . '/', 'package-skeleton', dashesToCamelCase($argv[1], true, ' '));
 
-searchDirectoryFiles(getcwd() . '/', 'PackageAi', dashesToCamelCase($argv[1], true));
-
-searchDirectoryFiles(getcwd() . '/', 'Package Ai', dashesToCamelCase($argv[1], true, ' '));
-
-replaceNameInCommands('Install.php', $argv[1]);
-replaceNameInCommands('Uninstall.php', $argv[1]);
-
+searchDirectoryFiles(getcwd() . '/', 'package-skeleton-human', dashesToCamelCase($argv[1], true, ' '));

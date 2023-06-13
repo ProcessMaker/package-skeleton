@@ -11,14 +11,14 @@ class Uninstall extends Command
      *
      * @var string
      */
-    protected $signature = '{package-name}:uninstall';
+    protected $signature = 'package-skeleton:uninstall';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Uninstall {package-name-human} Package';
+    protected $description = 'Uninstall PackageSkeleton Package';
 
     /**
      * Execute the console command.
@@ -27,6 +27,6 @@ class Uninstall extends Command
      */
     public function handle()
     {
-        $this->info('{package-name-human} package Uninstalled');
+        $this->info('PackageSkeleton package Uninstalled');
     }
 }
