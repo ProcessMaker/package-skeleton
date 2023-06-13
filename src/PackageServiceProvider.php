@@ -32,6 +32,12 @@ class PackageServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        //Register commands
+         $this->commands([
+            Console\Commands\Install::class,
+            Console\Commands\Uninstall::class,
+        ]);
+
         if ($this->app->runningInConsole()) {
             require(__DIR__ . '/../routes/console.php');
         } else {
