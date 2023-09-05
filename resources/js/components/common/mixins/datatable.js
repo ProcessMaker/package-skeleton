@@ -3,13 +3,13 @@
  * pagination transformers, etc.
  *
  */
-import Vuetable from "vuetable-2/src/components/Vuetable";
-import Pagination from "../../../components/common/Pagination";
+import Vuetable from 'vuetable-2/src/components/Vuetable';
+import Pagination from '../../../components/common/Pagination';
 
 export default {
   components: {
     Vuetable,
-    Pagination
+    Pagination,
   },
   created() {
     // Use our api to fetch our role listing
@@ -20,7 +20,7 @@ export default {
       if (!this.loading) {
         this.fetch();
       }
-    }, 250)
+    }, 250),
   },
   methods: {
     // Handler to properly format date/time columns according to localized format
@@ -30,7 +30,7 @@ export default {
         return window.moment(value)
           .format(format);
       }
-      return "n/a";
+      return 'n/a';
     },
     // Data manager takes new sorting and calls our fetch method
     dataManager(sortOrder, pagination) {
@@ -61,10 +61,10 @@ export default {
     },
     // Handler to change the page based on events fired from our pagination component
     onPageChange(page) {
-      if (page == "next") {
-        this.page = this.page + 1;
-      } else if (page == "prev") {
-        this.page = this.page - 1;
+      if (page == 'next') {
+        this.page += 1;
+      } else if (page == 'prev') {
+        this.page -= 1;
       } else {
         this.page = page;
       }
@@ -75,7 +75,7 @@ export default {
         this.page = this.data.meta.last_page;
       }
       this.fetch();
-    }
+    },
 
   },
   data() {
@@ -89,28 +89,28 @@ export default {
       // Our loading flag
       loading: false,
       // What column to order by (default of name)
-      orderBy: "name",
+      orderBy: 'name',
       // What direction to order by (default of ascending)
-      orderDirection: "asc",
+      orderDirection: 'asc',
       // Cancel token which should be stored from axios if you want to cancel the current in progress request
       cancelToken: null,
       css: {
-        tableClass: "table table-hover table-responsive text-break",
-        loadingClass: "loading",
-        detailRowClass: "vuetable-detail-row",
-        handleIcon: "grey sidebar icon",
-        sortableIcon: "fas fa-sort",
-        ascendingIcon: "fas fa-sort-up",
-        descendingIcon: "fas fa-sort-down",
-        ascendingClass: "ascending",
-        descendingClass: "descending",
+        tableClass: 'table table-hover table-responsive text-break',
+        loadingClass: 'loading',
+        detailRowClass: 'vuetable-detail-row',
+        handleIcon: 'grey sidebar icon',
+        sortableIcon: 'fas fa-sort',
+        ascendingIcon: 'fas fa-sort-up',
+        descendingIcon: 'fas fa-sort-down',
+        ascendingClass: 'ascending',
+        descendingClass: 'descending',
         renderIcon(classes, options) {
-          return `<i class="${classes.join(" ")}"></i>`;
-        }
+          return `<i class="${classes.join(' ')}"></i>`;
+        },
       },
       noDataTemplate() {
-        return "asdfas#####1111"
-      }
+        return 'asdfas#####1111';
+      },
     };
-  }
+  },
 };

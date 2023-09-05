@@ -1,15 +1,10 @@
-const { exec } = require('child_process');
-
-module.exports = function () {
-    exec("export VAGRANT_CWD='~/sites/processmaker' && \
-          vagrant ssh -c 'php processmaker/artisan vendor:publish \
-          --tag=package-skeleton \
-          --force'",
-        (err, stdout, stderr) => {
-            if (!err) {
-                console.log("\n" + stdout);
-            } else {
-                console.log(err);
-            }
-        });
-};
+const { exec } = require("child_process");
+const path = require('path');
+module.exports = function() {
+    const pathToCore = '/absolute/path/to/pm/core';
+    const package = path.basename(process.cwd());
+    const cmd = `php artisan vendor:publish --tag=${package} --force`;
+    exec(cmd, {cwd: pathToCore}, (error, stdout, stderr) => {
+        console.log(stdout, error, stderr);
+    });
+}

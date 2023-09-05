@@ -14,14 +14,26 @@ service provider located at src/PluginServiceProvider.php already has the public
 folder configured for publishing by default.
  */
 
-mix.setPublicPath('public')
-    .js('resources/js/package.js', 'js')
-    .sass('resources/sass/package.scss', 'css')
-    .version()
-    .then(() => {
-        try {
-            require('./webpack.callback')();
-        } catch (e) {
-            //No callback found
-        }
-    });
+mix
+  .webpackConfig({
+    externals: {
+      /** Add the dependencies available in ProcessMaker Core such as
+             * "@processmaker/vue-form-elements": "VueFormElements"
+             *
+             */
+      vue: 'Vue',
+    },
+  })
+  .setPublicPath('public')
+// .setResourceRoot('/vendor/processmaker/<name of the package>/')
+  .js('resources/js/package.js', 'js')
+  .vue()
+  .sass('resources/sass/package.scss', 'css')
+  .version()
+  .then(() => {
+    try {
+      require('./webpack.callback')();
+    } catch (e) {
+      // No callback found
+    }
+  });

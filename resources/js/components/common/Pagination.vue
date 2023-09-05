@@ -4,64 +4,86 @@
       <div
         v-if="tablePagination && tablePagination.last_page > 1"
         class="pagination"
-      >{{tablePagination.from + 1}} - {{tablePagination.to}} of {{tablePagination.total}} {{title}}</div>
+      >
+        {{ tablePagination.from + 1 }} - {{ tablePagination.to }} of {{ tablePagination.total }}
+        {{ title }}
+      </div>
       <div
-        class="pagination"
         v-if="tablePagination && tablePagination.last_page < 1"
-      >{{tablePagination.total}} {{title}}</div>
+        class="pagination"
+      >
+        {{ tablePagination.total }} {{ title }}
+      </div>
     </div>
     <div class="col-md-6 col-sm-12 d-flex justify-content-end button-pagination">
-      <div v-show="tablePagination && tablePagination.last_page > 1" :class="css.wrapperClass">
+      <div
+        v-show="tablePagination && tablePagination.last_page > 1"
+        :class="css.wrapperClass"
+      >
         <div
-          @click="loadPage(1)"
           :class="['pagination-nav-item', css.linkClass, isOnFirstPage ? css.disabledClass : '']"
+          @click="loadPage(1)"
         >
-          <i class="fas fa-angle-double-left"></i>
+          <i class="fas fa-angle-double-left" />
         </div>
         <div
-          @click="loadPage('prev')"
           :class="['pagination-nav-item', css.linkClass, isOnFirstPage ? css.disabledClass : '']"
+          @click="loadPage('prev')"
         >
-          <i class="fas fa-angle-left"></i>
+          <i class="fas fa-angle-left" />
         </div>
         <template v-if="notEnoughPages">
           <template v-for="n in totalPage">
             <div
+              :class="[
+                'pagination-nav-item',
+                css.pageClass,
+                isCurrentPage(n) ? css.activeClass : '',
+              ]"
               @click="loadPage(n)"
-              :class="['pagination-nav-item', css.pageClass, isCurrentPage(n) ? css.activeClass : '']"
               v-html="n"
-            ></div>
+            />
           </template>
         </template>
         <template v-else>
           <template v-for="n in windowSize">
             <div
-              @click="loadPage(windowStart+n-1)"
-              :class="['pagination-nav-item', css.pageClass, isCurrentPage(windowStart+n-1) ? css.activeClass : '']"
-              v-html="windowStart+n-1"
-            ></div>
+              :class="[
+                'pagination-nav-item',
+                css.pageClass,
+                isCurrentPage(windowStart + n - 1) ? css.activeClass : '',
+              ]"
+              @click="loadPage(windowStart + n - 1)"
+              v-html="windowStart + n - 1"
+            />
           </template>
         </template>
         <div
-          @click="loadPage('next')"
           :class="['pagination-nav-item', css.linkClass, isOnLastPage ? css.disabledClass : '']"
+          @click="loadPage('next')"
         >
-          <i class="fas fa-angle-right"></i>
+          <i class="fas fa-angle-right" />
         </div>
         <div
-          @click="loadPage(totalPage)"
           :class="['pagination-nav-item', css.linkClass, isOnLastPage ? css.disabledClass : '']"
+          @click="loadPage(totalPage)"
         >
-          <i class="fas fa-angle-double-right"></i>
+          <i class="fas fa-angle-double-right" />
         </div>
         <select
           v-if="perPageSelectEnabled"
           v-model="perPage"
           class="pagination-nav-item pagination-nav-drop"
         >
-          <option value="10">10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
+          <option value="10">
+            10
+          </option>
+          <option value="25">
+            25
+          </option>
+          <option value="50">
+            50
+          </option>
         </select>
       </div>
     </div>
@@ -69,27 +91,28 @@
 </template>
 
 <script>
-import PaginationMixin from "vuetable-2/src/components/VuetablePaginationMixin.vue";
+import PaginationMixin from 'vuetable-2/src/components/VuetablePaginationMixin.vue';
+
 export default {
   mixins: [PaginationMixin],
-  props: ["perPageSelectEnabled", "single", "plural"],
+  props: ['perPageSelectEnabled', 'single', 'plural'],
   data() {
     return {
-      perPage: 10
+      perPage: 10,
     };
   },
   computed: {
     title() {
-      if (this.tablePagination.total == 1) {
+      if (this.tablePagination.total === 1) {
         return this.single;
       }
       return this.plural;
-    }
+    },
   },
   watch: {
     perPage(value) {
-      this.$emit("changePerPage", value);
-    }
-  }
+      this.$emit('changePerPage', value);
+    },
+  },
 };
 </script>
