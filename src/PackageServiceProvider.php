@@ -9,10 +9,7 @@ use ProcessMaker\Package\PackageSkeleton\Listeners\PackageListener;
 
 class PackageServiceProvider extends ServiceProvider
 {
-
-    // Assign the default namespace for our controllers
-    protected $namespace = '\ProcessMaker\Package\PackageSkeleton\Http\Controllers';
-
+    
     /**
      * If your plugin will provide any services, you can register them here.
      * See: https://laravel.com/docs/5.6/providers#the-register-method
@@ -44,12 +41,10 @@ class PackageServiceProvider extends ServiceProvider
             // Assigning to the web middleware will ensure all other middleware assigned to 'web'
             // will execute. If you wish to extend the user interface, you'll use the web middleware
             Route::middleware('web')
-                ->namespace($this->namespace)
                 ->group(__DIR__ . '/../routes/web.php');
 
 
             Route::middleware('api')
-                ->namespace($this->namespace)
                 ->prefix('api/1.0')
                 ->group(__DIR__ . '/../routes/api.php');
 
