@@ -1,98 +1,82 @@
 <template>
   <div class="data-table">
-    <vuetable
-      :data-manager="dataManager"
-      :sort-order="sortOrder"
-      :css="css"
-      :api-mode="false"
+    <b-table
+      class="w-100"
+      striped
+      hover
+      :items="processes"
       :fields="fields"
-      :data="data"
-      data-path="data"
-      pagination-path="meta"
-      @vuetable:pagination-data="onPaginationData"
     >
-      <template
-        slot="actions"
-        slot-scope="props"
-      >
-        <div class="actions">
-          <div class="popout">
-            <b-btn
-              v-b-tooltip.hover
-              variant="action"
-              data-action="Edit"
-              data-toggle="modal"
-              data-target="#sampleModal"
-              title="Edit"
-              @click="onAction('edit-item', props.rowData, props.rowIndex)"
-            >
-              <i class="fas fa-edit" />
-            </b-btn>
-            <b-btn
-              v-b-tooltip.hover
-              variant="action"
-              title="Remove"
-              @click="onAction('remove-item', props.rowData, props.rowIndex)"
-            >
-              <i class="fas fa-trash-alt" />
-            </b-btn>
-          </div>
-        </div>
+      <template #cell(actions)="{ item }">
+        <b-button
+          variant="link"
+          size="sm"
+          @click="onAction('edit-item', item)"
+        >
+          <i class="fas fa-edit" />
+          Edit
+        </b-button>
+        <b-button
+          variant="link"
+          size="sm"
+          @click="onAction('remove-item', item)"
+        >
+          <i class="fas fa-trash" />
+          Delete
+        </b-button>
       </template>
-    </vuetable>
-    <pagination
-      ref="pagination"
-      single="Sample"
-      plural="Samples"
-      :per-page-select-enabled="true"
-      @changePerPage="changePerPage"
-      @vuetable-pagination:change-page="onPageChange"
-    />
+    </b-table>
   </div>
 </template>
 
 <script>
-import datatableMixin from './common/mixins/datatable';
-
 export default {
-  mixins: [datatableMixin],
-  props: ['filter'],
-
+  props: {
+    /**
+     * Filter of the table
+     */
+    filter: {
+      type: String,
+      default: '',
+    },
+  },
   data() {
     return {
+      processes: [],
       orderBy: 'name',
-      // Our listing of samples
-      sortOrder: [
-        {
-          field: 'name',
-          sortField: 'name',
-          direction: 'asc',
-        },
-      ],
+      orderDirection: 'asc',
+      page: 1,
+      perPage: 10,
       fields: [
         {
-          title: 'Name',
-          name: 'name',
+          label: 'Name',
+          key: 'name',
           sortField: 'name',
         },
         {
-          title: 'Status',
-          name: 'status',
+          label: 'Status',
+          key: 'status',
           sortField: 'status',
         },
         {
-          title: 'Created at',
-          name: 'created_at',
+          label: 'Created at',
+          key: 'created_at',
           sortField: 'created_at',
         },
         {
-          name: '__slot:actions',
-          title: '',
+          label: 'Actions',
+          key: 'actions',
         },
       ],
     };
   },
+  mounted() {
+    this.fetch();
+  },
   methods: {
+    transform(data) {
+      return data.data;
+    },
     formatStatus(status) {
       const stat = status.toLowerCase();
       const bubbleColor = {
@@ -105,24 +89,40 @@ export default {
         .charAt(0)
         .toUpperCase()}${stat.slice(1)}`;
     },
-    onAction(action, data) {
+    async onAction(action, data) {
       switch (action) {
         case 'edit-item':
-          this.$parent.edit(data);
+          this.$emit('edit', data);
           break;
-        case 'remove-item':
-          ProcessMaker.confirmModal(
-            'Caution!',
+        case 'remove-item': {
+          const confirmed = await this.$bvModal.msgBoxConfirm(
             `Are you sure to inactive the sample '${data.name}'?`,
-            '',
-            () => {
-              ProcessMaker.apiClient.delete(`admin/package-skeleton/${data.id}`).then(() => {
-                ProcessMaker.alert(`Sample ${data.name} has been deleted`, 'warning');
-                this.$emit('reload');
-              });
+            {
+              title: 'Caution!',
+              size: 'sm',
+              buttonSize: 'sm',
+              okVariant: 'secondary',
+              okTitle: 'Yes',
+              cancelVariant: 'outlined-secondary',
+              cancelTitle: 'No',
+              footerClass: 'p-2',
+              hideHeaderClose: false,
+              centered: true,
             },
           );
+          if (confirmed) {
+            ProcessMaker.apiClient
+              .delete(`admin/package-skeleton/${data.id}`)
+              .then(() => {
+                ProcessMaker.alert(
+                  `Sample ${data.name} has been deleted`,
+                  'warning',
+                );
+                this.$emit('reload');
+              });
+          }
           break;
+        }
         default:
           break;
       }
@@ -137,12 +137,10 @@ export default {
           `admin/package-skeleton/fetch?page=${this.page}&per_page=${this.perPage}&filter=${this.filter}&order_by=${this.orderBy}&order_direction=${this.orderDirection}`,
         )
         .then((response) => {
-          this.data = this.transform(response.data);
+          this.processes = this.transform(response.data);
           this.loading = false;
         });
     },
   },
 };
 </script>
-
-<style lang="scss" scoped></style>

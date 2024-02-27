@@ -1,22 +1,22 @@
 <?php
+
 namespace ProcessMaker\Package\PackageSkeleton\Http\Controllers;
 
+use Illuminate\Http\Request;
 use ProcessMaker\Http\Controllers\Controller;
 use ProcessMaker\Http\Resources\ApiCollection;
-use ProcessMaker\Package\PackageSkeleton\Models\Sample;
-use RBAC;
-use Illuminate\Http\Request;
-use URL;
-
+use ProcessMaker\Models\Process;
 
 class PackageSkeletonController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         return view('package-skeleton::index');
     }
 
-    public function fetch(Request $request){
-        $query = Sample::query();
+    public function fetch(Request $request)
+    {
+        $query = Process::query();
 
         $filter = $request->input('filter', '');
         if (!empty($filter)) {
@@ -38,27 +38,33 @@ class PackageSkeletonController extends Controller
         return new ApiCollection($response);
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $sample = new Sample();
         $sample->fill($request->json()->all());
         $sample->saveOrFail();
+
         return $sample;
     }
 
-    public function update(Request $request, $license_generator){
+    public function update(Request $request, $license_generator)
+    {
         Sample::where('id', $license_generator)->update([
-            'name' => $request->get("name"),
-            'status' => $request->get("status")
-            ]);
+            'name' => $request->get('name'),
+            'status' => $request->get('status'),
+        ]);
+
         return response([], 204);
     }
 
-    public function destroy($license_generator){
+    public function destroy($license_generator)
+    {
         Sample::find($license_generator)->delete();
+
         return response([], 204);
     }
 
-    public function generate($license_generator){
-
+    public function generate($license_generator)
+    {
     }
 }

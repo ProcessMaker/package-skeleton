@@ -56,6 +56,5 @@ class Install extends PackageInstallCommand
     {
         parent::handle();
         $this->info('Package Skeleton has been installed');
-
     }
 }

@@ -1,9 +1,4 @@
-import DataLoading from '../../../components/common/DataLoading';
-
 export default {
-  components: {
-    DataLoading,
-  },
   data() {
     return {
       apiDataLoading: true,

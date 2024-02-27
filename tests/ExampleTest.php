@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\PackageSkeleton;
 
 use Tests\TestCase;

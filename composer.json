@@ -11,8 +11,6 @@
             "email": "devops@processmaker.com"
         }
     ],
-    "require": {
-    },
     "autoload": {
         "psr-4": {
             "ProcessMaker\\Package\\PackageSkeleton\\": "src",
@@ -27,8 +25,20 @@
         }
     },
     "scripts": {
+        "cs": [
+            "@php vendor/bin/php-cs-fixer fix --show-progress=dots --ansi --diff -vv 2>&1 | php php-cs-fixer-post.php",
+            "@php vendor/bin/phpcbf",
+            "@php vendor/bin/phpcs --report-emacs"
+        ],
+        "post-install-cmd": [
+            "git config core.hooksPath ./.git-hooks"
+        ],
         "post-create-project-cmd": [
             "@php rename-project.php"
         ]
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.9",
+        "friendsofphp/php-cs-fixer": "^3.50"
     }
 }

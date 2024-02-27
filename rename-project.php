@@ -1,5 +1,6 @@
 <?php
 
+// @phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
 //use => php rename-project.php string_to_replace
 
 if (isset($argc)) {
@@ -29,9 +30,15 @@ function searchDirectoryFiles($path, $stringToReplace, $replaceWith)
     if (is_dir($path)) {
         if ($dh = opendir($path)) {
             while (($file = readdir($dh)) !== false) {
-                if (is_dir($path . $file) && $file != "." && $file != ".." && strpos($file, 'node_modules') === false && strpos($file, '.git') === false) {
+                if (
+                    is_dir($path . $file)
+                    && $file != "."
+                    && $file != ".."
+                    && strpos($file, 'node_modules') === false
+                    && strpos($file, '.git') === false
+                ) {
                     searchDirectoryFiles($path . $file . '/', $stringToReplace, $replaceWith);
-                } else if (!is_dir($path . $file)) {
+                } elseif (!is_dir($path . $file)) {
                     echo "\n Replacing: $path$file";
 
                     replaceStringInFile($path . $file, $stringToReplace, $replaceWith);
