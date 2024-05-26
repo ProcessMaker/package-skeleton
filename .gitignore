@@ -4,4 +4,4 @@ composer.lock
 webpack.callback.js
 .idea/
 .vscode/
-.php-cs-fixer.cache
+.php-cs-fixer.*

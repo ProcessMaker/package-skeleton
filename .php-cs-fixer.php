@@ -1,1 +1,0 @@
-/Users/jchirivella/processmaker/processmaker/.php-cs-fixer.php
