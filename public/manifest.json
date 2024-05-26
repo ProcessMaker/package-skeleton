@@ -1,0 +1,7 @@
+{
+  "resources/js/package.js": {
+    "file": "js/package.js",
+    "isEntry": true,
+    "src": "resources/js/package.js"
+  }
+}

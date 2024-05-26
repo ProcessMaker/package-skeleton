@@ -2,3 +2,6 @@ vendor
 node_modules
 composer.lock
 webpack.callback.js
+.idea/
+.vscode/
+.php-cs-fixer.cache

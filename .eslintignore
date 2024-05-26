@@ -4,3 +4,6 @@ routes
 src
 tests
 public
+dist/
+.idea/
+.vscode/

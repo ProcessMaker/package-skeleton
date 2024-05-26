@@ -1,12 +1,11 @@
-import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
 import VModal from 'vue-js-modal';
 import SampleListing from './components/SamplesListing.vue';
 
-Vue.use(VModal);
-Vue.use(BootstrapVue);
+window.Vue.use(VModal);
+window.Vue.use(BootstrapVue);
 
-new Vue({
+export default new window.Vue({
   el: '#app-package-skeleton',
   components: { SampleListing },
   data: {

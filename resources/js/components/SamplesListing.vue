@@ -57,7 +57,6 @@ import datatableMixin from './common/mixins/datatable';
 export default {
   mixins: [datatableMixin],
   props: ['filter'],
-
   data() {
     return {
       orderBy: 'name',
