@@ -6,8 +6,7 @@
   "license": "ISC",
   "homepage": "https://github.com/ProcessMaker/package-skeleton",
   "scripts": {
-    "dev": "vite",
-    "development": "vite",
+    "dev": "vite build --watch",
     "watch": "vite build --watch",
     "prod": "vite build",
     "lint:nofix": "eslint 'resources/**/*.{js,vue}' --no-fix",
