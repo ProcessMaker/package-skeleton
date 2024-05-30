@@ -5,3 +5,4 @@ webpack.callback.js
 .idea/
 .vscode/
 .php-cs-fixer.*
+public/js/*.js.map
