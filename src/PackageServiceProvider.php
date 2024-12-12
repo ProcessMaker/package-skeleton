@@ -1,4 +1,5 @@
 <?php
+
 namespace ProcessMaker\Package\PackageSkeleton;
 
 use Illuminate\Support\Facades\Route;
@@ -9,7 +10,6 @@ use ProcessMaker\Package\PackageSkeleton\Listeners\PackageListener;
 
 class PackageServiceProvider extends ServiceProvider
 {
-
     // Assign the default namespace for our controllers
     protected $namespace = '\ProcessMaker\Package\PackageSkeleton\Http\Controllers';
 
@@ -33,20 +33,19 @@ class PackageServiceProvider extends ServiceProvider
     public function boot()
     {
         //Register commands
-         $this->commands([
+        $this->commands([
             Console\Commands\Install::class,
             Console\Commands\Uninstall::class,
         ]);
 
         if ($this->app->runningInConsole()) {
-            require(__DIR__ . '/../routes/console.php');
+            require __DIR__ . '/../routes/console.php';
         } else {
             // Assigning to the web middleware will ensure all other middleware assigned to 'web'
             // will execute. If you wish to extend the user interface, you'll use the web middleware
             Route::middleware('web')
                 ->namespace($this->namespace)
                 ->group(__DIR__ . '/../routes/web.php');
-
 
             Route::middleware('api')
                 ->namespace($this->namespace)
@@ -59,10 +58,9 @@ class PackageServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../resources/views/', 'package-skeleton');
 
         $this->publishes([
-            __DIR__.'/../public' => public_path('vendor/processmaker/packages/package-skeleton'),
+            __DIR__ . '/../public' => public_path('vendor/processmaker/packages/package-skeleton'),
         ], 'package-skeleton');
 
         $this->app['events']->listen(PackageEvent::class, PackageListener::class);
-
     }
 }
