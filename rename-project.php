@@ -69,19 +69,16 @@ searchDirectoryFiles(getcwd() . '/', 'PackageSkeleton', dashesToCamelCase($argv[
 
 searchDirectoryFiles(getcwd() . '/', 'Package Skeleton', dashesToCamelCase($argv[1], true, ' '));
 
-// URL del servidor de ProcessMaker.
-// Prioridad: variable de entorno NAYRA_SERVER, luego prompt interactivo.
-// El placeholder se concatena para que este script no lo contenga literal
-// (si no, el propio script se reescribiría al hacer el reemplazo).
-$nayraPlaceholder = '__NAYRA_' . 'SERVER__';
+// ProcessMaker URL.
+$processmakerPlaceholder = '__PROCESSMAKER_' . 'SERVER__';
 $nayraServer = trim((string) getenv('NAYRA_SERVER'));
 if ($nayraServer === '' && function_exists('stream_isatty') && stream_isatty(STDIN)) {
-    echo "URL del servidor de ProcessMaker (ej. https://pm.example.com): ";
+    echo "\n\nProcessMaker Server URL(eg. https://pm.example.com): ";
     $nayraServer = trim((string) fgets(STDIN));
 }
 
 if ($nayraServer !== '') {
-    searchDirectoryFiles(getcwd() . '/', $nayraPlaceholder, rtrim($nayraServer, '/'));
+    searchDirectoryFiles(getcwd() . '/', $processmakerPlaceholder, rtrim($nayraServer, '/'));
 } else {
-    echo "\nNo se indicó la URL de ProcessMaker; se mantiene '" . $nayraPlaceholder . "'.\n";
+    echo "\nNo se indicó la URL de ProcessMaker; se mantiene '" . $processmakerPlaceholder . "'.\n";
 }

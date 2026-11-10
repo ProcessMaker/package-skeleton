@@ -2,7 +2,7 @@
   "mcpServers": {
     "processmaker": {
       "type": "http",
-      "url": "__NAYRA_SERVER__/mcp/processes"
+      "url": "__PROCESSMAKER_SERVER__/mcp/processes"
     }
   }
 }

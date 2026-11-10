@@ -7,3 +7,4 @@ webpack.callback.js
 .php-cs-fixer.php
 coverage
 .env
+.semantic-code-mcp/
