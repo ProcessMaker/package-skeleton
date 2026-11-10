@@ -71,14 +71,111 @@ searchDirectoryFiles(getcwd() . '/', 'Package Skeleton', dashesToCamelCase($argv
 
 // ProcessMaker URL.
 $processmakerPlaceholder = '__PROCESSMAKER_' . 'SERVER__';
-$nayraServer = trim((string) getenv('NAYRA_SERVER'));
-if ($nayraServer === '' && function_exists('stream_isatty') && stream_isatty(STDIN)) {
+$processmakerServer = trim((string) getenv('NAYRA_SERVER'));
+if ($processmakerServer === '' && function_exists('stream_isatty') && stream_isatty(STDIN)) {
     echo "\n\nProcessMaker Server URL(eg. https://pm.example.com): ";
-    $nayraServer = trim((string) fgets(STDIN));
+    $processmakerServer = trim((string) fgets(STDIN));
 }
 
-if ($nayraServer !== '') {
-    searchDirectoryFiles(getcwd() . '/', $processmakerPlaceholder, rtrim($nayraServer, '/'));
+if ($processmakerServer !== '') {
+    searchDirectoryFiles(getcwd() . '/', $processmakerPlaceholder, rtrim($processmakerServer, '/'));
 } else {
-    echo "\nNo se indicó la URL de ProcessMaker; se mantiene '" . $processmakerPlaceholder . "'.\n";
+    echo "\nNo ProcessMaker URL was provided; keeping '" . $processmakerPlaceholder . "' as is.\n";
+}
+
+// PM4 Skills.
+$pm4Skills = [
+    'pm4-action-by-email',
+    'pm4-collection',
+    'pm4-data-connector',
+    'pm4-decision-table',
+    'pm4-expressions',
+    'pm4-flow-genie',
+    'pm4-form-manual-task',
+    'pm4-overview',
+    'pm4-pm-block',
+    'pm4-process',
+    'pm4-process-health',
+    'pm4-screen',
+    'pm4-script',
+    'pm4-send-email',
+    'pm4-signal',
+    'pm4-sub-process',
+];
+$pm3Skills = [
+    'pm3-actions-by-email',
+    'pm3-case-scheduler',
+    'pm3-case-tracker',
+    'pm3-classic-process',
+    'pm3-consolidated',
+    'pm3-custom-cases-list',
+    'pm3-db-connection',
+    'pm3-dynaform',
+    'pm3-email-template',
+    'pm3-expressions',
+    'pm3-input-document',
+    'pm3-message-type',
+    'pm3-output-document',
+    'pm3-overview',
+    'pm3-pm-table',
+    'pm3-process',
+    'pm3-report-table',
+    'pm3-trigger',
+    'pm3-variables',
+    'pm3-web-entry',
+];
+$migrationSkills = [
+    'pm-analyze',
+    'pm3-pm4-email-notifications',
+    'pm3-pm4-input-documents',
+    'pm3-pm4-migration',
+    'pm3-pm4-output-documents',
+    'pm3-pm4-subprocess',
+    'pm3-pm4-triggers',
+    'pm3-pm4-web-entry',
+];
+
+$skillsProfile = strtolower(trim((string) getenv('PM_SKILLS_PROFILE')));
+if (!in_array($skillsProfile, ['migration', 'pm4'], true)) {
+    $skillsProfile = '';
+    if (function_exists('stream_isatty') && stream_isatty(STDIN)) {
+        while ($skillsProfile === '') {
+            echo "\nProject type:\n";
+            echo "  1) Migration Project from PM3 to PM4 (pm3, pm4 and migration skills)\n";
+            echo "  2) PM4 Project (pm4 skills only)\n";
+            echo "Option: ";
+            $answer = fgets(STDIN);
+            if ($answer === false) {
+                break;
+            }
+            $answer = strtolower(trim($answer));
+            if ($answer === '1' || $answer === 'migration') {
+                $skillsProfile = 'migration';
+            } elseif ($answer === '2' || $answer === 'pm4') {
+                $skillsProfile = 'pm4';
+            } else {
+                echo "Please choose 1 or 2.\n";
+            }
+        }
+    }
+}
+
+if ($skillsProfile === '') {
+    echo "\nNo skills profile was provided; skipping skills installation.\n";
+} else {
+    $selectedSkills = $skillsProfile === 'pm4'
+        ? $pm4Skills
+        : array_merge($pm3Skills, $pm4Skills, $migrationSkills);
+
+    $command = 'npx skills add processmaker/skills -y';
+    foreach ($selectedSkills as $skill) {
+        $command .= ' --skill ' . escapeshellarg($skill);
+    }
+
+    echo "\nInstalling ProcessMaker skills (" . $skillsProfile . ")...\n";
+    echo $command . "\n";
+    passthru($command, $skillsExitCode);
+    if ($skillsExitCode !== 0) {
+        echo "\nFailed to install ProcessMaker skills (exit code " . $skillsExitCode . ").\n";
+    }
 }
