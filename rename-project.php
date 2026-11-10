@@ -3,57 +3,148 @@
 // @phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
 //use => php rename-project.php string_to_replace
 
-if (isset($argc)) {
-    for ($i = 0; $i < $argc; $i++) {
-        echo 'Argument #' . $i . ' - ' . $argv[$i] . "\n";
+$supportsColor = function_exists('stream_isatty') && stream_isatty(STDOUT)
+    && getenv('NO_COLOR') === false
+    && strtolower((string) getenv('TERM')) !== 'dumb';
+
+$paint = static function (string $code, string $text) use ($supportsColor): string {
+    return $supportsColor ? "\033[{$code}m{$text}\033[0m" : $text;
+};
+
+$bold = static fn (string $text): string => $paint('1', $text);
+$dim = static fn (string $text): string => $paint('2', $text);
+$cyan = static fn (string $text): string => $paint('36', $text);
+$green = static fn (string $text): string => $paint('32', $text);
+$yellow = static fn (string $text): string => $paint('33', $text);
+
+$logo = <<<'LOGO'
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%+=++++++++%%%%%%%%%%%%*+++++++++#%%%%%%%%
+%%%%%%%%*..........:+%%%%%%%%#:..........=%%%%%%%%
+%%%%%%%%*............:*%%%%#-............=%%%%%%%%
+%%%%%%%%*..............:*#=..........  ..=%%%%%%%%
+%%%%%%%%*......+%%%%%%%%+-#%%%%%%%%.   ..=%%%%%%%%
+%%%%%%%%*......*%%%%%%+....-%%%%%%%.  ...=%%%%%%%%
+%%%%%%%%%#.....*%%%%*........-%%%%%.....+%%%%%%%%%
+%%%%%%%%%%%*...*%%*:..... . ...=%%%...=%%%%%%%%%%%
+%%%%%%%%%%%%%+.*#:...      .....:+%.=#%%%%%%%%%%%%
+%%%%%%%%%%%%%%*=.....       ......==%%%%%%%%%%%%%%
+%%%%%%%%%%%%#=.*%-......    ....:*%.:#%%%%%%%%%%%%
+%%%%%%%%%%%+...*%%#-.....  ...:*%%%...-#%%%%%%%%%%
+%%%%%%%%%+.....*%%%%#.... ...+%%%%%.....-%%%%%%%%%
+%%%%%%%%*......*%%%%%%*....+%%%%%%%......=%%%%%%%%
+%%%%%%%%*......=#######*=-*#######*..  ..=%%%%%%%%
+%%%%%%%%*..............-#%+..........  ..=%%%%%%%%
+%%%%%%%%*...      ...-#%%%%%=....      ..=%%%%%%%%
+%%%%%%%%*..........:*%%%%%%%%%-..........=%%%%%%%%
+%%%%%%%%%#********#%%%%%%%%%%%%%*********%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%  PROCESSMAKER  %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+LOGO;
+
+echo "\n";
+foreach (explode("\n", $logo) as $line) {
+    echo $cyan($line) . "\n";
+}
+echo "\n";
+echo '  ' . $paint('1;97', 'ProcessMaker') . ' ' . $dim('·') . ' ' . $cyan('Package Skeleton') . "\n";
+echo '  ' . $dim('Rename & configure your new package project') . "\n\n";
+
+$hr = static function (string $label = '') use ($dim, $cyan): void {
+    if ($label === '') {
+        echo $dim(str_repeat('─', 52)) . "\n";
+        return;
     }
-} else {
-    echo "argc and argv disabled\n";
+    $pad = max(0, 50 - strlen($label));
+    echo $dim('─ ') . $cyan($label) . $dim(' ' . str_repeat('─', $pad)) . "\n";
+};
+
+$info = static function (string $message) use ($cyan): void {
+    echo $cyan('  › ') . $message . "\n";
+};
+
+$ok = static function (string $message) use ($green): void {
+    echo $green('  ✓ ') . $message . "\n";
+};
+
+$warn = static function (string $message) use ($yellow): void {
+    echo $yellow('  ! ') . $message . "\n";
+};
+
+$ask = static function (string $prompt) use ($bold, $cyan): string {
+    echo $cyan('  › ') . $bold($prompt);
+    $answer = fgets(STDIN);
+    return $answer === false ? '' : trim($answer);
+};
+
+if (!isset($argc)) {
+    $warn('argc and argv are disabled; cannot continue.');
+    echo "\n";
     return;
 }
 
 if (!isset($argv[1])) {
     $argv[1] = basename(getcwd());
-    echo 'Name project: ' . $argv[1] . "\n";
 }
+
+$projectName = $argv[1];
+$hr('project');
+$info('Working directory: ' . $dim(getcwd()));
+$info('Package name:      ' . $bold($projectName));
+echo "\n";
+
+$replacedCount = 0;
 
 function replaceStringInFile($filename, $stringToReplace, $replaceWith)
 {
     $content = file_get_contents($filename);
+    if ($content === false || strpos($content, $stringToReplace) === false) {
+        return false;
+    }
+
     $content_chunks = explode($stringToReplace, $content);
     $content = implode($replaceWith, $content_chunks);
     file_put_contents($filename, $content);
+
+    return true;
 }
 
-function searchDirectoryFiles($path, $stringToReplace, $replaceWith)
+function searchDirectoryFiles($path, $stringToReplace, $replaceWith, &$replacedCount, $dim)
 {
-    if (is_dir($path)) {
-        if ($dh = opendir($path)) {
-            while (($file = readdir($dh)) !== false) {
-                if (
-                    is_dir($path . $file)
-                    && $file != "."
-                    && $file != ".."
-                    && strpos($file, 'node_modules') === false
-                    && strpos($file, '.git') === false
-                ) {
-                    searchDirectoryFiles($path . $file . '/', $stringToReplace, $replaceWith);
-                } elseif (!is_dir($path . $file)) {
-                    echo "\n Replacing: $path$file";
+    if (!is_dir($path)) {
+        echo "\n  Invalid path...\n";
+        return;
+    }
 
-                    replaceStringInFile($path . $file, $stringToReplace, $replaceWith);
+    if ($dh = opendir($path)) {
+        while (($file = readdir($dh)) !== false) {
+            if (
+                is_dir($path . $file)
+                && $file != '.'
+                && $file != '..'
+                && strpos($file, 'node_modules') === false
+                && strpos($file, '.git') === false
+            ) {
+                searchDirectoryFiles($path . $file . '/', $stringToReplace, $replaceWith, $replacedCount, $dim);
+            } elseif (!is_dir($path . $file)) {
+                if (replaceStringInFile($path . $file, $stringToReplace, $replaceWith)) {
+                    $replacedCount++;
+                    $relative = ltrim(str_replace(getcwd(), '', $path . $file), '/');
+                    echo $dim('    · ') . $relative . "\n";
                 }
             }
-            closedir($dh);
         }
-    } else {
-        echo "\n Invalid path...";
+        closedir($dh);
     }
 }
 
 function dashesToCamelCase($string, $capitalizeFirstCharacter = false, $replace = '')
 {
-
     $str = str_replace('-', $replace, ucwords($string, '-'));
 
     if (!$capitalizeFirstCharacter) {
@@ -63,25 +154,38 @@ function dashesToCamelCase($string, $capitalizeFirstCharacter = false, $replace 
     return $str;
 }
 
-searchDirectoryFiles(getcwd() . '/', 'package-skeleton', $argv[1]);
+$hr('renaming');
+$info('Replacing ' . $bold('package-skeleton') . ' → ' . $bold($projectName));
+searchDirectoryFiles(getcwd() . '/', 'package-skeleton', $projectName, $replacedCount, $dim);
 
-searchDirectoryFiles(getcwd() . '/', 'PackageSkeleton', dashesToCamelCase($argv[1], true));
+$pascal = dashesToCamelCase($projectName, true);
+$info('Replacing ' . $bold('PackageSkeleton') . ' → ' . $bold($pascal));
+searchDirectoryFiles(getcwd() . '/', 'PackageSkeleton', $pascal, $replacedCount, $dim);
 
-searchDirectoryFiles(getcwd() . '/', 'Package Skeleton', dashesToCamelCase($argv[1], true, ' '));
+$title = dashesToCamelCase($projectName, true, ' ');
+$info('Replacing ' . $bold('Package Skeleton') . ' → ' . $bold($title));
+searchDirectoryFiles(getcwd() . '/', 'Package Skeleton', $title, $replacedCount, $dim);
+$ok("Updated {$replacedCount} file(s)");
+echo "\n";
 
 // ProcessMaker URL.
 $processmakerPlaceholder = '__PROCESSMAKER_' . 'SERVER__';
 $processmakerServer = trim((string) getenv('NAYRA_SERVER'));
+$hr('processmaker');
 if ($processmakerServer === '' && function_exists('stream_isatty') && stream_isatty(STDIN)) {
-    echo "\n\nProcessMaker Server URL(eg. https://pm.example.com): ";
-    $processmakerServer = trim((string) fgets(STDIN));
+    $processmakerServer = $ask('ProcessMaker Server URL (eg. https://pm.example.com): ');
 }
 
 if ($processmakerServer !== '') {
-    searchDirectoryFiles(getcwd() . '/', $processmakerPlaceholder, rtrim($processmakerServer, '/'));
+    $server = rtrim($processmakerServer, '/');
+    $info('Setting server → ' . $bold($server));
+    $urlCount = 0;
+    searchDirectoryFiles(getcwd() . '/', $processmakerPlaceholder, $server, $urlCount, $dim);
+    $ok("Server URL written to {$urlCount} file(s)");
 } else {
-    echo "\nNo ProcessMaker URL was provided; keeping '" . $processmakerPlaceholder . "' as is.\n";
+    $warn("No ProcessMaker URL provided; keeping '{$processmakerPlaceholder}' as is.");
 }
+echo "\n";
 
 // PM4 Skills.
 $pm4Skills = [
@@ -139,29 +243,27 @@ $skillsProfile = strtolower(trim((string) getenv('PM_SKILLS_PROFILE')));
 if (!in_array($skillsProfile, ['migration', 'pm4'], true)) {
     $skillsProfile = '';
     if (function_exists('stream_isatty') && stream_isatty(STDIN)) {
+        $hr('skills');
+        echo $cyan('  › ') . $bold('Project type') . "\n\n";
+        echo '    ' . $paint('1;36', '1') . '  Migration  ' . $dim('(PM3 → PM4 + migration skills)') . "\n";
+        echo '    ' . $paint('1;36', '2') . '  PM4 only   ' . $dim('(pm4 skills)') . "\n\n";
+
         while ($skillsProfile === '') {
-            echo "\nProject type:\n";
-            echo "  1) Migration Project from PM3 to PM4 (pm3, pm4 and migration skills)\n";
-            echo "  2) PM4 Project (pm4 skills only)\n";
-            echo "Option: ";
-            $answer = fgets(STDIN);
-            if ($answer === false) {
-                break;
-            }
-            $answer = strtolower(trim($answer));
+            $answer = strtolower($ask('Option [1/2]: '));
             if ($answer === '1' || $answer === 'migration') {
                 $skillsProfile = 'migration';
             } elseif ($answer === '2' || $answer === 'pm4') {
                 $skillsProfile = 'pm4';
             } else {
-                echo "Please choose 1 or 2.\n";
+                $warn('Please choose 1 or 2.');
             }
         }
+        echo "\n";
     }
 }
 
 if ($skillsProfile === '') {
-    echo "\nNo skills profile was provided; skipping skills installation.\n";
+    $warn('No skills profile provided; skipping skills installation.');
 } else {
     $selectedSkills = $skillsProfile === 'pm4'
         ? $pm4Skills
@@ -172,10 +274,17 @@ if ($skillsProfile === '') {
         $command .= ' --skill ' . escapeshellarg($skill);
     }
 
-    echo "\nInstalling ProcessMaker skills (" . $skillsProfile . ")...\n";
-    echo $command . "\n";
+    $hr('install');
+    $info('Installing ProcessMaker skills (' . $bold($skillsProfile) . ', ' . count($selectedSkills) . ' skills)...');
+    echo $dim('    ' . $command) . "\n\n";
     passthru($command, $skillsExitCode);
     if ($skillsExitCode !== 0) {
-        echo "\nFailed to install ProcessMaker skills (exit code " . $skillsExitCode . ").\n";
+        $warn("Failed to install ProcessMaker skills (exit code {$skillsExitCode}).");
+    } else {
+        $ok('Skills installed successfully');
     }
 }
+
+echo "\n";
+$hr();
+echo '  ' . $green('✦') . ' ' . $paint('1;97', 'Done') . $dim(" — {$projectName} is ready.") . "\n\n";
