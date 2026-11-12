@@ -1,8 +1,12 @@
-This folder contains the structure of each projects. Each of them are organized as follows:
-- [project-name](./{project-name})/
-- [project-name](./{project-name})/bpmn/ Here are placed the BPMN processes needed for this project
-- [project-name](./{project-name})/screens/ Here are placed the yaml screens needed for this project
-- [project-name](./{project-name})/scripts/ Here are placed the php scripts needed for this project
+This folder contains the structure of each project. Each of them is organized as follows:
+
+- `projects/{project-name}/bpmn/` — BPMN processes
+- `projects/{project-name}/screens/` — YAML screens
+- `projects/{project-name}/scripts/` — PHP scripts
+
+See [AGENTS.md](./AGENTS.md) and root [AGENTS.md](../AGENTS.md).
 
 ## Notation rules
-- Assets use kebab case notation for assets names. e.g. `project-name.bpmn`, `screen-name.yaml`, `script-name.php`
+
+- Assets use kebab-case names, e.g. `project-name-intake.xml`, `project-name-form.yaml`, `project-name-save.php`
+- Basename of script/screen files equals the ProcessMaker asset title

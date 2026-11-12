@@ -11,7 +11,7 @@ description: >-
 
 # Asset coverage report
 
-Write it in English when either piece of work finishes. One current PDF per domain: overwrite `ai-docs/{slug}/{slug}-coverage.html` and the PDF. Credit Deal is the layout sample, not a source of numbers: [credit-deal-coverage.html](../../../ai-docs/credit-deal-coverage.html).
+Write it in English when either piece of work finishes. One current PDF per domain: overwrite `ai-docs/{slug}/{slug}-coverage.html` and the PDF. Credit Deal is the layout sample, not a source of numbers: [credit-deal-coverage.html](./credit-deal-coverage.html).
 
 ## Outputs
 
@@ -87,9 +87,9 @@ Closing-path percent = points of the seven "yes" rows / 80. Full percent = point
 6. Open items. Every row names the asset, the count, and why it was not implemented.
 7. Dropped on purpose, with why.
 8. Implemented work that still needs a manual check (engine walkthrough, visual diff of SQL screens, empty group ids, generated email attachments).
-9. Publication. If nothing was published, say so. If it was, list process, screen, and script ids and what the publish did not install (package classes, Vue bundle, migration, seeds).
+9. Publication. If nothing was published, say so. If it was, list process, screen, and script ids and what the publish did not install (package classes, Vue bundle, migration, seeds). Name the target only via `PM_BASE_URL` from the package `.env` (wizard at create-project), or “the configured PM4 instance”. Do not hardcode tenant hostnames (for example `*.dev.cloud.processmaker.net`).
 
-No secrets, tokens, or personal emails.
+No secrets, API tokens, or personal emails. Do not paste full `PM_BASE_URL` values in reports unless the user asked for a host-specific handoff.
 
 ## PDF
 

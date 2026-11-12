@@ -1,4 +1,4 @@
-# TCE project folder structure
+# Project folder structure
 
 Canonical layout for a new domain `{slug}` / `{Pascal}` / table prefix `{prefix}`.
 
@@ -13,7 +13,7 @@ ai-docs/{slug}/
     └── frontend.md      # Vue screens and shared components used
 ```
 
-Mirror High School: a dedicated `ai-docs/{slug}/` tree, not a single mega-file. Index every new architecture doc from `AGENTS.md`.
+Use a dedicated `ai-docs/{slug}/` tree, not a single mega-file. Index every new architecture doc from that domain `AGENTS.md`.
 
 Root `AGENTS.md` must link `./ai-docs/{slug}/AGENTS.md`.
 
@@ -22,7 +22,7 @@ Root `AGENTS.md` must link `./ai-docs/{slug}/AGENTS.md`.
 ```
 projects/{slug}/
 ├── bpmn/
-│   └── {slug}-process.bpmn          # omit if not in scope
+│   └── {slug}-{purpose}.xml
 ├── scripts/
 │   ├── {slug}-script-name.php
 │   └── {slug}-other-script.php
@@ -33,13 +33,14 @@ projects/{slug}/
 
 ## PHP (hexagonal)
 
-Namespace: `ProcessMaker\Package\PackageName\Projects\{Pascal}\...`
+Namespace: `ProcessMaker\Package\PackageSkeleton\Projects\{Pascal}\...` (renamed with the package).
 
 ```
-src/Projects/Shared/Domain/Model.php   # JsonSerializable + ValidatesWithJsonSchema (always)
+src/Projects/Shared/Domain/Model.php   # JsonSerializable + optional JSON Schema validation
+src/Traits/ValidatesWithJsonSchema.php
 src/Projects/Shared/Domain/Ports/      # only after a second domain copies the same I/O
 src/Projects/Shared/Infrastructure/    # adapters for those Shared ports
-src/Projects/Shared/Application/UseCases/  # APP scripts shared across two+ domains
+src/Projects/Shared/Application/UseCases/  # scripts shared across two+ domains
 
 src/Projects/{Pascal}/
 ├── Domain/
@@ -61,7 +62,7 @@ database/migrations/                   # {prefix}_* tables
 
 ```
 resources/js/projects/{slug}/
-├── shared/                            # domain CAT2 only if reused by 2+ screens
+├── shared/                            # domain-shared only if reused by 2+ screens
 └── {screenFolder}/
     ├── {ScreenName}.vue
     ├── {ScreenName}.stories.js        # title: Projects/{Pascal}/...
@@ -71,7 +72,7 @@ resources/js/projects/{slug}/
     └── config/
 ```
 
-Shared CAT1: `resources/js/projects/shared/`. Dashboards that are not domain-specific stay in `resources/js/dashboards/`.
+Package-wide shared UI: `resources/js/projects/shared/`.
 
 ## Tests
 
@@ -84,5 +85,5 @@ tests/Feature/                         # HTTP only
 Run:
 
 ```bash
-PROCESSMAKER_HOME=/path/to/processmaker XDEBUG_MODE=off php ./vendor/bin/phpunit --configuration phpunit.xml --no-coverage {test_path}
+/usr/local/bin/phpunit vendor/processmaker/package-skeleton/{test_path}
 ```

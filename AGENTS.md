@@ -12,11 +12,11 @@ Ask only if missing:
 
 1. **Slug** (kebab-case): e.g. `project-name`
 2. **Pascal name**: e.g. `ProjectName`
-3. **Table prefix** (short, unique, like Military `amil_`): e.g. `ahs_`
+3. **Table prefix** (short, unique): e.g. `ahs_`
 
 ## Target tree
 
-Replace `{slug}` / `{Pascal}` / `{prefix}`. Full tree: [structure.md](structure.md).
+Replace `{slug}` / `{Pascal}` / `{prefix}`. Full tree: [ai-docs/structure.md](ai-docs/structure.md).
 
 ```
 ai-docs/{slug}/
@@ -25,11 +25,9 @@ ai-docs/{slug}/
   architecture/workflow.md
   architecture/frontend.md
 
-projects/{slug}/bpmn/{slug}-transcript.xml
-projects/{slug}/bpmn/{slug}-applicant.xml
+projects/{slug}/bpmn/{slug}-{purpose}.xml
 projects/{slug}/scripts/{slug}-{action}.php
-# ProjectName: projects/{slug}/scripts/{project-name}/{title}.php
-projects/{slug}/tce-{slug}/{process-name}/{screen-name}.yaml
+projects/{slug}/screens/{slug}-{purpose}.yaml
 
 src/Projects/{Pascal}/
   Domain/Entities/
@@ -63,33 +61,33 @@ Copy this checklist and complete it in order:
 
 ### 1. Folders + ai-docs
 
-Create `ai-docs/{slug}/` the same way as `ai-docs/high-school/` (domain index + architecture docs).
+Create `ai-docs/{slug}/` (domain index + architecture docs). See [ai-docs/structure.md](ai-docs/structure.md).
 
 `AGENTS.md` must list:
 
 - Architecture doc links
 - BPMN files and `DB_ID` / `process_id` (fill after upsert-process-bpmn)
 - `pm:screenRef` → YAML + Vue path
-- `pm:scriptRef` → `projects/{slug}/scripts/{slug}-*.php` → Application use case (ProjectName: `projects/{slug}/scripts/{slug}-title.php`)
+- `pm:scriptRef` → `projects/{slug}/scripts/{slug}-*.php` → Application use case
 
 ### 2. Hexagonal PHP
 
-Create `src/Projects/{Pascal}/` per [hexagonal.md](hexagonal.md). Namespace: `ProcessMaker\Package\PackagePlg\Projects\{Pascal}`. Existing PSR-4 (`PackagePlg\` → `src`) covers it; do not add a new autoload root.
+Create `src/Projects/{Pascal}/` per [ai-docs/hexagonal.md](ai-docs/hexagonal.md). Namespace: `ProcessMaker\Package\PackageSkeleton\Projects\{Pascal}`. Existing PSR-4 (`PackageSkeleton\` → `src`) covers it; do not add a new autoload root. After `rename-project.php`, `PackageSkeleton` becomes the package Pascal name.
 
-**Skeleton** is empty folders (`Domain/Entities`, `Domain/Schemas`, `Domain/Ports`, `Application/UseCases`, `Infrastructure/Persistence`). Do not invent a dummy `Student` entity. First use case appears when there is a script task: `{Action}` under `Application/UseCases/` with `$data` in / array out. No port until there is DB/HTTP. Shape: [hexagonal.md](hexagonal.md).
+**Skeleton** is empty folders (`Domain/Entities`, `Domain/Schemas`, `Domain/Ports`, `Application/UseCases`, `Infrastructure/Persistence`) plus shared base [Model](src/Projects/Shared/Domain/Model.php). Do not invent a dummy entity. First use case appears when there is a script task: `{Action}` under `Application/UseCases/` with `$data` in / array out. No port until there is DB/HTTP. Shape: [ai-docs/hexagonal.md](ai-docs/hexagonal.md). Entities: [ai-docs/models.md](ai-docs/models.md).
 
-- Domain: entities extending shared `Projects\Shared\Domain\Model` **when there is a real entity**. Ports only when there is I/O. Schemas in `Domain/Schemas/`. See [models.md](models.md).
-- Application: one use case per script task (replaces Military `*Actions` statics). Constructor-inject ports **if** the use case talks to DB/HTTP. Search Shared/Military before writing a new class; extract duplicated I/O to a Shared port. Verb+object names and purpose docblocks — see [hexagonal.md](hexagonal.md).
-- Infrastructure: RedBean adapters implementing ports. Copy `ScriptTaskContainer` + `app()` helper only if this domain already uses that pattern (Military). Prefer wrapper `isset` + `new UseCase($adapter)` or `new UseCase()` with no deps. Never Laravel `app()` from script tasks.
+- Domain: entities extending shared `Projects\Shared\Domain\Model` **when there is a real entity**. Ports only when there is I/O. Schemas in `Domain/Schemas/`.
+- Application: one use case per script task. Constructor-inject ports **if** the use case talks to DB/HTTP. Search `src/Projects/Shared` before writing a new class; extract duplicated I/O to a Shared port.
+- Infrastructure: RedBean (or HTTP) adapters implementing ports. Prefer wrapper `isset` + `new UseCase($adapter)` or `new UseCase()` with no deps. Never Laravel `app()` from script tasks.
 
-HTTP/Eloquent stays in `src/Http` and `src/Models/{Pascal}` only for package APIs. Script tasks must not call those models. Domain entities must extend `ProcessMaker\Package\PackagePlg\Projects\Shared\Domain\Model`, never a new project-local base and never Eloquent.
+HTTP/Eloquent stays in `src/Http` and `src/Models/{Pascal}` only for package APIs. Script tasks must not call those models. Domain entities must extend `ProcessMaker\Package\PackageSkeleton\Projects\Shared\Domain\Model`, never a new project-local base and never Eloquent.
 
-Table names: `{prefix}_*` (Military: `amil_*`). Document them in `architecture/database.md`.
+Table names: `{prefix}_*`. Document them in `architecture/database.md`.
 
 ### 3. Scripts
 
 - Filename basename **equals** the ProcessMaker script **title**.
-- kebab-case: `{slug}-{action}.php`. Optional `-se` suffix for Smart Extract. Keep legacy titles (`APP - …`) unchanged.
+- kebab-case: `{slug}-{action}.php`. Optional `-se` suffix for Smart Extract.
 - Thin wrapper: global `$data` in, return array. Constructor-inject ports when there is I/O. PHPUnit `include`s the wrapper and may set port fakes (`isset(...)`).
 
 ```php
@@ -100,40 +98,36 @@ Table names: `{prefix}_*` (Military: `amil_*`). Document them in `architecture/d
  *
  * BPMN scriptTask: {human label} ({process}).
  * Thin wrapper: global $data in, merged process array out.
- * Logic: {UseCase}. I/O: none, or port + RedBean/Guzzle adapter (not Laravel Http).
+ * Logic: {UseCase}. I/O: none, or port + adapter (not Laravel Http).
  */
 
-use ProcessMaker\Package\PackagePlg\Projects\{Pascal}\Application\UseCases\{Action};
+use ProcessMaker\Package\PackageSkeleton\Projects\{Pascal}\Application\UseCases\{Action};
 
 return (new {Action}())->handle($data);
 ```
 
-When the use case needs a port, construct the adapter in the wrapper (`isset($transcripts) && $transcripts instanceof TranscriptRepository ? $transcripts : new RedBeanTranscriptRepository()`) only if that port **and** adapter exist under `src/Projects/`. Do not import a Shared port class that is not in the tree. Second copy of the same I/O → extract Shared then.
+When the use case needs a port, construct the adapter in the wrapper (`isset($port) && $port instanceof PortInterface ? $port : new RedBeanAdapter()`) only if that port **and** adapter exist under `src/Projects/`. Use RedBean or Guzzle adapters from `Infrastructure/` — not Laravel `Http` or Eloquent from script tasks.
 
 ### 4. Screens (YAML + Vue)
 
 **Version in git as YAML**, not Screen Builder JSON dumps.
 
-- File: `documentation/tce-{slug}/{process-name}/{kebab-screen}.yaml`
+- File: `projects/{slug}/screens/{kebab-screen}.yaml`
 - A domain-specific root Vue component composed from local child components. The root owns domain coordination; child components own distinct controls or sections.
 - Every screen item must include an item-level `inspector: []` when no inspector fields are defined; Screen Builder validation expects this array.
-- Use one `VueComponentRenderTemplate` for a simple screen, or expose multiple direct components/items when Screen Builder must insert or replace controls between sections.
+- Use one `VueComponentRenderTemplate` for a simple screen, or multiple direct components/items when Screen Builder must insert or replace controls between sections.
 - Vue root: `resources/js/projects/{slug}/{camelOrPascalFolder}/{ScreenName}.vue`
-- Local children: `components/{Domain}{Section}.vue`; import them locally for internal composition. In `public-screen-components.json`, the parent entry must declare its direct children in nested `components`, and every child must also have an independent top-level `{ name, key }` entry. Repeat recursively for nested child dependencies. Register only the root with `registerPublicScreenComponent` in the applicable FORM/DISPLAY Screen Builder entrypoints and package-wide when the screen is used outside Screen Builder.
-- Reuse `resources/js/projects/shared/` first (CAT1 in military frontend.md), but assume each domain has independent business logic. Similar screens are references, not implementations.
-- Before coding, document the screen extension points: which sections are code-owned, slot-based, direct `contentVue` components, or separate Screen Builder items.
+- Local children: `components/{Domain}{Section}.vue`; import them locally for internal composition. In `resources/js/designer/public-screen-components.json`, the parent entry must declare its direct children in nested `components`, and every child must also have an independent top-level `{ name, key }` entry. Register only the root with `registerPublicScreenComponent` in the applicable FORM/DISPLAY Screen Builder entrypoints (and package-wide when the screen runs outside Screen Builder).
+- Reuse `resources/js/projects/shared/` first when a control is used by 2+ screens; each domain still owns its business logic.
+- Before coding, document which sections are code-owned, slot-based, `contentVue` components, or separate Screen Builder items (see [custom-vue-components.md](./ai-docs/custom-vue-components.md)).
 - New UUID per YAML control (`uuidgen`).
 - `handlerVue` maps process `$data` into the Vue `v-model`; guard `this.data` because Screen Builder may evaluate the handler before transient process data exists.
 
-Do not use legacy `APP - APV3 - ...` screen titles.
-
 ### 5. BPMN
 
-- `{slug}-transcript.xml` — TCO reviews extracted transcript
-- `{slug}-applicant.xml` — application / articulation (if in scope)
-- **Design for readability:** keep the top-level graph as a short phase story (Capture → Validate → Review → …). Put the tasks, gateways, and flows of each phase inside an embedded `bpmn:subProcess` (same request). Use `bpmn:adHocSubProcess` / `bpmn:transaction` only when those semantics are needed. See [.agents/skills/pm4-sub-process/design.md](.agents/skills/pm4-sub-process/design.md).
-- **CallActivity** only when reusing another published process or needing a separate child request (e.g. shared `documentation/bpmn/upload-transcript.xml`). Do not create a child process merely to hide nodes — embed them instead.
-- Prefer [pm4-process](.agents/skills/pm4-process/SKILL.md) + [pm4-sub-process](.agents/skills/pm4-sub-process/SKILL.md) when authoring or editing BPMN with the AI.
+- Prefer readable top-level phases; put phase detail inside embedded `bpmn:subProcess` when helpful.
+- **CallActivity** only when reusing another published process or needing a separate child request.
+- Prefer [pm4-process](.agents/skills/pm4-process/SKILL.md) + [pm4-sub-process](.agents/skills/pm4-sub-process/SKILL.md) when those skills are installed (create-project wizard).
 
 ### 6. Publish
 
@@ -153,42 +147,39 @@ Before publishing or handing off a new screen:
 
 - Run ESLint on modified Vue/JavaScript source.
 - Run relevant Storybook interaction tests for loading, empty, error, success, and submit/cancel behavior.
-- After Storybook verification, list each relevant story as a markdown link `[ExportName](http://127.0.0.1:7007/?path=/story/<storyId>)`. See root `AGENTS.md` → *After verifying Storybook (frontend handoff)*.
+- After Storybook verification, list each relevant story as a markdown link `[ExportName](http://127.0.0.1:7007/?path=/story/<storyId>)`.
 - Review SonarQube findings introduced in `resources/js/projects/**`; fix new Blocker, Critical, and Major issues.
-- Keep complexity, duplication, unused code, unsafe nested access, and unhandled API failures out of new code.
-- Guard `this.data` in `handlerVue` because the Screen Builder editor may evaluate it before transient process data exists.
-- Do not use broad SonarQube exclusions or unexplained lint suppressions; document any unavoidable suppression.
-- Include validation commands and pre-existing findings in the PR description.
+- Guard `this.data` in `handlerVue`.
+- Do not use broad SonarQube exclusions or unexplained lint suppressions.
 
 ## Naming
 
 | Asset | Convention | Example |
 | --- | --- | --- |
-| Domain slug | kebab-case | `high-school` |
-| PHP path / namespace | `src/Projects/{Pascal}/` | `ProcessMaker\Package\PackagePlg\Projects\HighSchool` |
-| Domain model base | extend shared `Model` | `ProcessMaker\Package\PackagePlg\Projects\Shared\Domain\Model` |
-| JSON Schema | `Domain/Schemas/{entity}.schema.json` | `src/Projects/HighSchool/Domain/Schemas/student.schema.json` |
-| BPMN file | `{slug}-{purpose}.xml` | `high-school-transcript.xml` |
-| Script file/title | `{slug}-{action}.php` | `high-school-execute-transcript-actions.php` |
-| Screen YAML | `{slug}-{purpose}.yaml` | `high-school-transcript.yaml` |
-| Vue folder | camelCase or Pascal matching peers | `transcriptHighSchool/` |
-| Storybook | `Projects/{Pascal}/...` | `Projects/HighSchool/Transcript` |
-| DB tables | `{prefix}_*` | `ahs_transcripts` |
+| Domain slug | kebab-case | `project-name` |
+| PHP path / namespace | `src/Projects/{Pascal}/` | `ProcessMaker\Package\PackageSkeleton\Projects\ProjectName` |
+| Domain model base | extend shared `Model` | `ProcessMaker\Package\PackageSkeleton\Projects\Shared\Domain\Model` |
+| JSON Schema | `Domain/Schemas/{entity}.schema.json` | `src/Projects/ProjectName/Domain/Schemas/record.schema.json` |
+| BPMN file | `{slug}-{purpose}.xml` | `project-name-intake.xml` |
+| Script file/title | `{slug}-{action}.php` | `project-name-save-record.php` |
+| Screen YAML | `{slug}-{purpose}.yaml` | `project-name-intake.yaml` |
+| Vue folder | camelCase or Pascal matching peers | `intakeForm/` |
+| Storybook | `Projects/{Pascal}/...` | `Projects/ProjectName/Intake` |
+| DB tables | `{prefix}_*` | `ahs_records` |
 | PHP locals | camelCase words, not loop letters | `$institutionId` not `$instCode` / `$x` |
 
 ## Do not
 
-- Put new hexagonal PHP in `src/{Pascal}/` or `src/Military/` (use `src/Projects/{Pascal}/`)
+- Put new hexagonal PHP outside `src/Projects/{Pascal}/`
 - Add a project-local `*Model` base; extend `Projects\Shared\Domain\Model`
 - Put JSON schemas under `src/Models/{Pascal}/Schemas/` for new domains
-- Put domain logic only inside `documentation/scripts/*.php`
+- Put domain logic only inside unversioned ProcessMaker UI assets
 - Call Laravel Eloquent from script tasks
 - Store screens only in ProcessMaker (YAML is the versioned artifact)
 - Store processes only in Modeler (BPMN XML is the versioned artifact)
 - Patch numeric `pm:scriptRef` / `pm:screenRef` into git BPMN after deploy
 - Create ad-hoc Storybook top-level groups
 - Write skills or docs under `~/.cursor/skills-cursor/`
-
 
 ## Storybook organization
 
@@ -198,56 +189,40 @@ Run Storybook with Node 20+:
 
 All story entries should be grouped using the `title` field as the canonical structure.
 
-Keep named story exports in each `*.stories.js` file in alphabetical order by
-export name. Keep the default metadata export at the top; sort only the named
-stories that follow it.
+Keep named story exports in each `*.stories.js` file in alphabetical order by export name. Keep the default metadata export at the top; sort only the named stories that follow it.
 
 Use these Storybook top-level groups:
-- `Components`: shared reusable UI components.
-  - Keep legacy `UI` stories under `Components/UI/*`.
-- `Projects`: domain-specific stories grouped under:
-  - `Projects/{ProjectName}/*`
 
-Aim to keep stories close to their implementation area, and prefer moving any story into the most specific group above rather than creating ad-hoc top-level groups.
+- `Components`: shared reusable UI components.
+- `Projects`: domain-specific stories under `Projects/{ProjectName}/*`
 
 ### After verifying Storybook (frontend handoff)
 
-When frontend changes are verified with Storybook (interaction tests or manual
-checks), list each relevant story as a **markdown link** whose label is the
-story export name and whose target opens that story. Do not paste bare URLs
-beside the name.
+List each relevant story as a markdown link whose label is the story export name:
 
 - Dev server: `npm run storybook` → `http://127.0.0.1:7007`
 - Link form: `[ExportName](http://127.0.0.1:7007/?path=/story/<storyId>)`
-- Resolve `<storyId>` from the running index when available
-  (`http://127.0.0.1:7007/index.json` → `entries[].id`), or from the CSF
-  `title` + export name in Storybook kebab-case
-  (e.g. title `Projects/CollegeV2/Applicant/CollegeCourseEvaluation` + export
-  `AutoSelectSentToStudent` →
-  `projects-collegev2-applicant-collegecourseevaluation--auto-select-sent-to-student`).
-
-Example handoff:
-
-- [AutoSelectSentToStudent](http://127.0.0.1:7007/?path=/story/projects-collegev2-applicant-collegecourseevaluation--auto-select-sent-to-student)
-- [SendCourseToStudent](http://127.0.0.1:7007/?path=/story/projects-collegev2-applicant-collegecourseevaluation--send-course-to-student)
+- Resolve `<storyId>` from `http://127.0.0.1:7007/index.json` → `entries[].id`, or from CSF `title` + export name in Storybook kebab-case.
 
 ## PHPUnit development
-If you need to run a phpunit test prefer to use:
+
+Prefer:
+
 ```
-/usr/local/bin/phpunit vendor/processmaker/package-example4/{test_path}
+/usr/local/bin/phpunit vendor/processmaker/package-skeleton/{test_path}
 ```
 
-Test script tasks could have some special behavior, it usually expect to have a global variable $data and return an array, some tests for script task can be found at `tests/Unit/Documentation`
+Script tasks usually expect a global `$data` and return an array. Script wrapper tests live under `tests/Unit/Documentation` when present.
 
 ## Cross-domain architecture
 
-- [Best code practices](./ai-docs/best-code-practices.md): **SonarQube must pass** on changed code, cognitive complexity ≤ 15, classes ≤ 20 methods, and related quality expectations.
-- [Custom Vue Components](./ai-docs/custom-vue-components.md): administration, Screen Builder runtime resolution, browser caching, security, and Screen Import/Export dependencies.
+- [Best code practices](./ai-docs/best-code-practices.md): **SonarQube must pass** on changed code, cognitive complexity ≤ 15, classes ≤ 20 methods.
 - [Projects hexagonal organization](./ai-docs/hexagonal.md)
+- [Domain models](./ai-docs/models.md)
 - [Projects assets organization](./projects/AGENTS.md)
 
 ## Projects Domain-Specific Instructions
 
-Each project have its particular structure, refer to:
+Each project has its own structure under:
 
 - [project-name](./ai-docs/{project-name}/AGENTS.md)

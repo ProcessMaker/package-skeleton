@@ -222,6 +222,163 @@ function ensureMigrationDirectories(string $projectRoot): void
     }
 }
 
+/**
+ * Package-owned deploy skills that must survive `npx skills add`.
+ *
+ * @return list<string>
+ */
+function packageUpsertSkillNames(): array
+{
+    return [
+        'upsert-script-php',
+        'upsert-screen-yaml',
+        'upsert-process-bpmn',
+    ];
+}
+
+function copyDirectoryRecursive(string $source, string $destination): bool
+{
+    if (!is_dir($source)) {
+        return false;
+    }
+    if (!is_dir($destination) && !mkdir($destination, 0755, true) && !is_dir($destination)) {
+        return false;
+    }
+
+    $handle = opendir($source);
+    if ($handle === false) {
+        return false;
+    }
+
+    while (($entry = readdir($handle)) !== false) {
+        if ($entry === '.' || $entry === '..') {
+            continue;
+        }
+        $from = $source . DIRECTORY_SEPARATOR . $entry;
+        $to = $destination . DIRECTORY_SEPARATOR . $entry;
+        if (is_dir($from)) {
+            if (!copyDirectoryRecursive($from, $to)) {
+                closedir($handle);
+                return false;
+            }
+            continue;
+        }
+        if (!copy($from, $to)) {
+            closedir($handle);
+            return false;
+        }
+    }
+
+    closedir($handle);
+    return true;
+}
+
+function removeDirectoryRecursive(string $path): void
+{
+    if (!is_dir($path)) {
+        return;
+    }
+
+    $handle = opendir($path);
+    if ($handle === false) {
+        return;
+    }
+
+    while (($entry = readdir($handle)) !== false) {
+        if ($entry === '.' || $entry === '..') {
+            continue;
+        }
+        $target = $path . DIRECTORY_SEPARATOR . $entry;
+        if (is_dir($target)) {
+            removeDirectoryRecursive($target);
+            continue;
+        }
+        @unlink($target);
+    }
+
+    closedir($handle);
+    @rmdir($path);
+}
+
+/**
+ * @return string|null Absolute backup directory, or null when nothing was copied.
+ */
+function backupPackageUpsertSkills(string $projectRoot): ?string
+{
+    $skillsRoot = rtrim($projectRoot, '/\\') . '/.agents/skills';
+    $backupRoot = sys_get_temp_dir() . '/pm-package-upsert-' . bin2hex(random_bytes(4));
+    $copied = 0;
+
+    foreach (packageUpsertSkillNames() as $name) {
+        $source = $skillsRoot . '/' . $name;
+        if (!is_dir($source)) {
+            continue;
+        }
+        if (!copyDirectoryRecursive($source, $backupRoot . '/' . $name)) {
+            removeDirectoryRecursive($backupRoot);
+            return null;
+        }
+        $copied++;
+    }
+
+    return $copied > 0 ? $backupRoot : null;
+}
+
+/**
+ * @param callable(string): void $ok
+ * @param callable(string): void $warn
+ */
+function restorePackageUpsertSkills(string $projectRoot, ?string $backupRoot, callable $ok, callable $warn): void
+{
+    if ($backupRoot === null || !is_dir($backupRoot)) {
+        return;
+    }
+
+    $skillsRoot = rtrim($projectRoot, '/\\') . '/.agents/skills';
+    if (!is_dir($skillsRoot) && !mkdir($skillsRoot, 0755, true) && !is_dir($skillsRoot)) {
+        $warn('Could not recreate .agents/skills to restore upsert skills.');
+        removeDirectoryRecursive($backupRoot);
+        return;
+    }
+
+    foreach (packageUpsertSkillNames() as $name) {
+        $source = $backupRoot . '/' . $name;
+        $destination = $skillsRoot . '/' . $name;
+        if (!is_dir($source) || is_dir($destination)) {
+            continue;
+        }
+        if (copyDirectoryRecursive($source, $destination)) {
+            $ok('Restored package skill ' . $name);
+            continue;
+        }
+        $warn('Could not restore package skill ' . $name);
+    }
+
+    removeDirectoryRecursive($backupRoot);
+}
+
+/**
+ * @param callable(string): void $ok
+ * @param callable(string): void $warn
+ */
+function assertPackageUpsertSkills(string $projectRoot, callable $ok, callable $warn): void
+{
+    $skillsRoot = rtrim($projectRoot, '/\\') . '/.agents/skills';
+    $missing = [];
+    foreach (packageUpsertSkillNames() as $name) {
+        if (!is_dir($skillsRoot . '/' . $name)) {
+            $missing[] = $name;
+        }
+    }
+
+    if ($missing === []) {
+        $ok('Package upsert skills are present under .agents/skills/');
+        return;
+    }
+
+    $warn('Missing package upsert skills: ' . implode(', ', $missing));
+}
+
 $hr('renaming');
 $info('Replacing ' . $bold('package-skeleton') . ' → ' . $bold($projectName));
 searchDirectoryFiles(getcwd() . '/', 'package-skeleton', $projectName, $replacedCount, $dim);
@@ -358,6 +515,8 @@ if ($skillsProfile === 'migration') {
     echo "\n";
 }
 
+$upsertSkillsBackup = null;
+
 if ($skillsProfile === '') {
     $warn('No skills profile provided; skipping skills installation.');
 } else {
@@ -371,15 +530,23 @@ if ($skillsProfile === '') {
     }
 
     $hr('install');
+    $upsertSkillsBackup = backupPackageUpsertSkills($projectRoot);
+    if ($upsertSkillsBackup === null) {
+        $warn('Could not backup package upsert skills before install; continuing.');
+    }
     $info('Installing ProcessMaker skills (' . $bold($skillsProfile) . ', ' . count($selectedSkills) . ' skills)...');
     echo $dim('    ' . $command) . "\n\n";
     passthru($command, $skillsExitCode);
+    restorePackageUpsertSkills($projectRoot, $upsertSkillsBackup, $ok, $warn);
     if ($skillsExitCode !== 0) {
         $warn("Failed to install ProcessMaker skills (exit code {$skillsExitCode}).");
     } else {
         $ok('Skills installed successfully');
     }
 }
+
+$hr('package-skills');
+assertPackageUpsertSkills($projectRoot, $ok, $warn);
 
 echo "\n";
 $hr();
