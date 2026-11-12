@@ -53,7 +53,7 @@ Copy this checklist and complete it in order:
 - [ ] 3. Thin ProcessMaker scripts (first use case only when there is a script; empty skeleton is OK)
 - [ ] 4. YAML screens + Vue + Storybook
 - [ ] 5. BPMN XML with ${screen:title} and ${script:title} (no numeric refs in git)
-- [ ] 6. Publish: upsert-script-php, then upsert-screen-yaml, then upsert-process-bpmn
+- [ ] 6. Publish (see §6): package on PM4 first, then upsert-script-php → upsert-screen-yaml → upsert-process-bpmn
 - [ ] 7. If new src/ classes are used from a script, rebuild the php-nayra executor
 - [ ] 8. Record process_id / screen_id / script_id in workflow.md (not in git BPMN refs)
 - [ ] 9. PHPUnit for use cases + script wrappers
@@ -135,6 +135,17 @@ Do not use legacy `APP - APV3 - ...` screen titles.
 - **CallActivity** only when reusing another published process or needing a separate child request (e.g. shared `documentation/bpmn/upload-transcript.xml`). Do not create a child process merely to hide nodes — embed them instead.
 - Prefer [pm4-process](.agents/skills/pm4-process/SKILL.md) + [pm4-sub-process](.agents/skills/pm4-sub-process/SKILL.md) when authoring or editing BPMN with the AI.
 
+### 6. Publish
+
+**Precondition:** this package is installed on the target ProcessMaker instance (`composer require processmaker/{package-slug}` and `php artisan {package-slug}:install`). The upsert CLIs call `POST /api/1.0/{package-slug}/deploy-*` on **that server**, not on a git-only checkout. Set `PM_BASE_URL` and `PM_SYNC_TOKEN` in the package repo `.env` (wizard or `.env.example`).
+
+Order (skills under `.agents/skills/`):
+
+1. `upsert-script-php` — `projects/{slug}/scripts/{title}.php`
+2. `upsert-screen-yaml` — `projects/{slug}/screens/{title}.yaml`
+3. `upsert-process-bpmn` — `projects/{slug}/bpmn/{name}.xml` (portable `${screen:}` / `${script:}` / `${process:}`)
+
+MCP (`/mcp/screens`, `/mcp/processes`) is optional for authoring; git → instance sync uses the deploy endpoints above unless the user asked for MCP-only publish.
 
 ### Screen quality gate
 
