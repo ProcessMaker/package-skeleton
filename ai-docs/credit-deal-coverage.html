@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Credit Deal coverage: PM3 to PM4</title>
+<style>
+  @page { size: letter; margin: 0.7in 0.7in 0.75in; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: #1c1c1c;
+    font: 11pt/1.45 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  header { border-bottom: 3px solid #711426; padding-bottom: 10px; margin-bottom: 16px; }
+  h1 { font-size: 20pt; line-height: 1.2; margin: 0 0 6px; color: #711426; }
+  h2 { font-size: 14pt; margin: 22px 0 6px; color: #711426; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 0 0 4px; }
+  p { margin: 0 0 8px; }
+  .meta { color: #444; font-size: 9.5pt; }
+  .kpis { display: flex; gap: 10px; margin: 14px 0; }
+  .kpi { flex: 1; border: 1px solid #ddd; padding: 8px 10px; }
+  .kpi b { display: block; font-size: 18pt; line-height: 1.1; white-space: nowrap; }
+  .kpi span { display: block; min-height: 2.6em; font-size: 8.5pt; color: #333; }
+  .bar { display: flex; height: 16px; width: 100%; background: #eee; margin: 6px 0 4px; }
+  .bar i { display: block; height: 100%; }
+  .legend { font-size: 8.5pt; color: #333; }
+  .legend b { font-weight: 600; }
+  .sw { display: inline-block; width: 8px; height: 8px; margin-right: 3px; vertical-align: baseline; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 9pt; page-break-inside: auto; }
+  th, td { border-bottom: 1px solid #ddd; text-align: left; vertical-align: top; padding: 5px 6px; }
+  th { border-bottom: 2px solid #711426; font-size: 8.5pt; letter-spacing: 0.02em; }
+  td.n, th.n { text-align: right; white-space: nowrap; width: 52px; }
+  tr { page-break-inside: avoid; }
+  .note { font-size: 8.5pt; color: #444; margin-top: 2px; }
+  .cols { display: flex; gap: 16px; }
+  .cols > div { flex: 1; }
+  .callout { border-left: 3px solid #711426; padding: 6px 10px; margin: 8px 0 10px; background: #f7f4f4; font-size: 10pt; }
+  footer { margin-top: 18px; border-top: 1px solid #ddd; padding-top: 6px; font-size: 8pt; color: #555; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Credit Deal coverage: PM3 to PM4</h1>
+  <p class="meta">Private Credit Deal Closing Process. Source: pm-analyze of Private_Credit_Deal_Closing_Process-2 (2).pmx2, compared with projects/credit-deal and src/Projects/CreditDeal. 10 November 2026.</p>
+</header>
+
+<div class="kpis">
+  <div class="kpi"><b>88%</b><span>317 of 358 assets resolved</span></div>
+  <div class="kpi"><b>83%</b><span>Closing path, without generated files</span></div>
+  <div class="kpi"><b>66%</b><span>Full scope, with PDFs and the dashboard</span></div>
+  <div class="kpi"><b>41</b><span>Items still open</span></div>
+</div>
+
+<p>Of 358 inventory items, 308 were ported, 9 were dropped on purpose, and 41 remain open.</p>
+<div class="bar" aria-hidden="true">
+  <i style="width:86.0%;background:#2f6f4e"></i>
+  <i style="width:2.5%;background:#8a8a8a"></i>
+  <i style="width:11.5%;background:#711426"></i>
+</div>
+<p class="legend"><span class="sw" style="background:#2f6f4e"></span><b>308 ported</b> &nbsp; <span class="sw" style="background:#8a8a8a"></span><b>9 dropped</b> &nbsp; <span class="sw" style="background:#711426"></span><b>41 open</b></p>
+<p class="note">Denominator: 73 dynaforms, 70 triggers, 56 user tasks, 37 input documents, 7 output documents, 56 assignments, 9 object permissions, 6 supervisor steps plus 2 supervisor groups, 34 grids, 4 email templates, 2 business report tables, 1 message start, and 1 case tracker. The 381 process variables are excluded because PM4 does not require a variable catalog. PMT_TOTALS_TEST and the xtest dynaform are included, as dropped items.</p>
+
+<h2>Coverage by asset family</h2>
+<p>Implemented means a PM4 artifact exists. Dropped means a PM3 user-interface hack, a test asset, or an event with no flow. Open means it still needs a decision or new work.</p>
+<table>
+  <thead><tr><th>Family</th><th class="n">Implemented</th><th class="n">Dropped</th><th class="n">Open</th><th class="n">Total</th></tr></thead>
+  <tbody>
+    <tr><td>User tasks</td><td class="n">56</td><td class="n">0</td><td class="n">0</td><td class="n">56</td></tr>
+    <tr><td>Triggers</td><td class="n">49</td><td class="n">7</td><td class="n">14</td><td class="n">70</td></tr>
+    <tr><td>Dynaforms</td><td class="n">70</td><td class="n">1</td><td class="n">2</td><td class="n">73</td></tr>
+    <tr><td>Grids</td><td class="n">34</td><td class="n">0</td><td class="n">0</td><td class="n">34</td></tr>
+    <tr><td>Input documents</td><td class="n">37</td><td class="n">0</td><td class="n">0</td><td class="n">37</td></tr>
+    <tr><td>Output documents</td><td class="n">0</td><td class="n">0</td><td class="n">7</td><td class="n">7</td></tr>
+    <tr><td>Email templates</td><td class="n">4</td><td class="n">0</td><td class="n">0</td><td class="n">4</td></tr>
+    <tr><td>Assignments</td><td class="n">56</td><td class="n">0</td><td class="n">0</td><td class="n">56</td></tr>
+    <tr><td>Object permissions</td><td class="n">0</td><td class="n">0</td><td class="n">9</td><td class="n">9</td></tr>
+    <tr><td>Report tables</td><td class="n">2</td><td class="n">0</td><td class="n">0</td><td class="n">2</td></tr>
+    <tr><td>Supervision</td><td class="n">0</td><td class="n">0</td><td class="n">8</td><td class="n">8</td></tr>
+    <tr><td>Message start</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">1</td></tr>
+    <tr><td>Case tracker</td><td class="n">0</td><td class="n">0</td><td class="n">1</td><td class="n">1</td></tr>
+    <tr><td><b>Total</b></td><td class="n"><b>308</b></td><td class="n"><b>9</b></td><td class="n"><b>41</b></td><td class="n"><b>358</b></td></tr>
+  </tbody>
+</table>
+<p class="note">Source: pm-analyze of the .pmx2, 10 November 2026. Counts are items, not percentages.</p>
+
+<h2>Functionality level</h2>
+<p>This is a different number from asset coverage. An output document is a small share of the inventory and a large share of what a user receives by email. The 66% weights ten capabilities to 100 points. The 83% uses only the seven capabilities on the closing path (80 points) and renormalizes them.</p>
+<table>
+  <thead><tr><th>Capability</th><th class="n">Weight</th><th class="n">Coverage</th><th>What the score reflects</th></tr></thead>
+  <tbody>
+    <tr><td>Task forms</td><td class="n">22</td><td class="n">90%</td><td>All 56 tasks have a screen. The 25 SQL or custom-CSS dynaforms were rebuilt from fields, not pixel for pixel.</td></tr>
+    <tr><td>Routing</td><td class="n">14</td><td class="n">85%</td><td>Rules BR-30 to BR-57 are in the BPMN. The graph was rewritten and has not been executed in Nayra.</td></tr>
+    <tr><td>Ported rules</td><td class="n">16</td><td class="n">78%</td><td>49 of the 63 triggers that carry business behavior. The other 7 triggers are PM3 screen hacks.</td></tr>
+    <tr><td>Notifications</td><td class="n">10</td><td class="n">70%</td><td>The catalog and templates exist. Generated PDF attachments do not. Next-user mail uses the native PM4 task notification.</td></tr>
+    <tr><td>Uploads</td><td class="n">8</td><td class="n">95%</td><td>Input documents are request files, indexed in acd_uploaded_documents.</td></tr>
+    <tr><td>PDFs and Excel</td><td class="n">12</td><td class="n">0%</td><td>No output document and no Final Allocation workbook.</td></tr>
+    <tr><td>Assignment</td><td class="n">6</td><td class="n">60%</td><td>All 56 assignments are modeled. Group ids and lead usernames are still empty.</td></tr>
+    <tr><td>Permissions and supervisors</td><td class="n">4</td><td class="n">0%</td><td>Nine view permissions and eight supervisor records were not migrated.</td></tr>
+    <tr><td>Reports</td><td class="n">4</td><td class="n">100%</td><td>Both business report tables: process report and allocation report.</td></tr>
+    <tr><td>Plugin dashboard</td><td class="n">4</td><td class="n">0%</td><td>Re-approval, clone, date edit, and document export were not built.</td></tr>
+  </tbody>
+</table>
+
+<div class="cols">
+  <div>
+    <h3>Inside the 83%</h3>
+    <p>The 56 tasks, routing rules BR-30 to BR-57, deal initiation, allocation, signatures, the uploaded-file index, the notification catalog, and the two report tables. The process still needs a Nayra walkthrough, and group ids and usernames still need to be loaded.</p>
+  </div>
+  <div>
+    <h3>What brings it down to 66%</h3>
+    <p>No generated PDF and no allocation Excel. Emails that attached those documents in PM3 go out without the file. Case-view permissions, supervisors, and the plugin dashboard do not exist.</p>
+  </div>
+</div>
+
+<h2>Open items that need a manual review</h2>
+<div class="callout"><b>This is not a failed automatic conversion.</b> convert and import were not run. The rows below were left out on purpose, or the source was incomplete.</div>
+<table>
+  <thead><tr><th>Asset</th><th class="n">Count</th><th>Why it was not implemented</th></tr></thead>
+  <tbody>
+    <tr><td>Output documents</td><td class="n">7</td><td>Deal Initial Form, Private Credit Deal Closing Document, Final Allocation, Funding Trade Ticket, Signatures Funding Trade Ticket, Funding Approval Signature Document, and LK2. In PM3 a trigger builds each one from HTML or JRXML. Phase 2: there is no PDF generator.</td></tr>
+    <tr><td>Triggers for those documents</td><td class="n">13</td><td>Generate HTML (DT1, LK2, all forms, final allocation, signatures), Generate Signature Approval Document HTML, Generate Final Allocation Excel, Merge documents of OR2 and signature, Get generated document of DT1, Get url funding approval signature document, Define Signature Document Url, Get all documents with tasks, Delete Upload Documents Zip, and Set sub-agent value for final allocation excel. They depend on the PDFs and the Excel file.</td></tr>
+    <tr><td>Set Funding Date</td><td class="n">1</td><td>Sets DC_FUNDING_DATE to today, but its uid is not attached to any step in the .pmx2. It was not ported. Confirm whether a task was supposed to stamp the funding date.</td></tr>
+    <tr><td>Object permissions</td><td class="n">9</td><td>Nine groups with VIEW on any object and any case status. Six are Legal Counsel, Operations, Law Clerk, Tax, Product Director, and Deal Team. Three uids are not in the process groups: 48727917…, 79294896…, and 79545412…. PM3 group uids do not exist in PM4.</td></tr>
+    <tr><td>Supervisors</td><td class="n">8</td><td>Two groups (Law Clerk and Deal Team) and six steps: DT.01, DT.04, DT.06, DT.07, DT.11/LL.02, and LK.01. In PM3 the supervisor rewrote the case (saveDataSupervisor). This belongs to the dashboard and is phase 2.</td></tr>
+    <tr><td>Standalone dynaforms</td><td class="n">2</td><td>Supervisor Execute Trigger Form, for the same reason as the supervisors. TR.00 Tax Representative Group Assignment: there is no TR.00 task; the tax user is already chosen on DT.01.</td></tr>
+    <tr><td>Plugin psNorthleafFunctions</td><td class="n">1 tar</td><td>class.phpLibrary.php is truncated (21 KB of 48 KB). sendNextUserNotification and the end of generateFinalAllocationExcel could not be read. listCases, editDate, reapproval, backToPD1, backToLK7, cloneCase, copyDocumentCase, mainReports, and exportUploadedDocuments stay in phase 2.</td></tr>
+    <tr><td>Case tracker</td><td class="n">1</td><td>PM3 shows the map plus routing and message history. PM4 already has the request page. No equivalent public page was built.</td></tr>
+    <tr><td>START message LEAD</td><td class="n">1</td><td>A message start with no throw and no flow. It was omitted. Confirm that no other process throws it.</td></tr>
+  </tbody>
+</table>
+
+<h2>Dropped on purpose</h2>
+<table>
+  <thead><tr><th>Asset</th><th class="n">Count</th><th>Why it is not ported</th></tr></thead>
+  <tbody>
+    <tr><td>PM3 screen hacks</td><td class="n">7</td><td>Remove Assign Screen, Define if should remove assign screen, Set Application and Task, Set logo, TMP restart data Grid, Check if task DT.06 and OR.00 are done, and Get required fields of Subgrids. The logo lives on the EMAIL screen and required fields live in taskForms.json.</td></tr>
+    <tr><td>xtest and PMT_TOTALS_TEST</td><td class="n">2</td><td>A test dynaform and a test report table, with no business description.</td></tr>
+    <tr><td>Thread-closing script tasks</td><td class="n">5</td><td>Check Open Threads, Finish Actions, Send OR Notification, Unify DT.17 and DT.04, DT.05, and Unify LL3. PM3 closed sibling threads by hand. In PM4 every branch delivers one token and the join is parallel. The mail portion of Send OR Notification and Check Open Threads is in PrepareNotification.</td></tr>
+    <tr><td>IC.1 Actions by Email</td><td class="n">1</td><td>The only ABE row with type LINK. Sixty-four other rows are empty. It was replaced by a multi-instance task over DC_ABE_USERS: the signer opens the form, enters the city, and confirms. dcRequestSignature.html, actionsByEmail.html, and actionsByEmailErrorReply.html were copied and are not sent.</td></tr>
+  </tbody>
+</table>
+
+<h2>Implemented, and still needs a manual check</h2>
+<table>
+  <thead><tr><th>Area</th><th>What to review</th></tr></thead>
+  <tbody>
+    <tr><td>BPMN</td><td>229 nodes, 56 tasks, paired joins, and no broken references in PHPUnit. It has not been executed in Nayra. Walk a case with UMF, post-close, ClearPar, HST, and an invalid signer, which returns to LK.7.</td></tr>
+    <tr><td>25 SQL or CSS dynaforms</td><td>The converter marked them manual. They were rebuilt from the .pmx2 fields. Compare DT.01, PD.1, LK.7, OR.02, and OR.11 with PM3.</td></tr>
+    <tr><td>Assignments</td><td>All 56 use a process variable, but acd_group_roles.group_id and lead_username are null. The start event has no group. Until that is set, the case does not assign.</td></tr>
+    <tr><td>Trade-ticket signatures</td><td>PM3 swapped the OR.02 and OR.11 validation variables. Each step now writes its own flag (DC_VALIDATE_OR2_SIGNATURE and DC_VALIDATE_OR11_SIGNATURE) and uses that task’s assignee, not the person who completed the previous task.</td></tr>
+    <tr><td>Email attachments</td><td>NR-01, NR-05, and NR-09 point at generated documents that do not exist. The email is sent. The PDF is not.</td></tr>
+    <tr><td>TR.5</td><td>In PM3 the condition is 1 == 2. It stays behind DC_COLLATERAL_QUESTIONNAIRE_ENABLED, which defaults to false.</td></tr>
+    <tr><td>Screen Builder and scripts</td><td>Load public/js/screen-builder-components.js on FORM and DISPLAY pages, and rebuild the php-nayra executor. The scripts use new classes that a script push does not copy.</td></tr>
+  </tbody>
+</table>
+
+<h2>Publication</h2>
+<p>On 10 November 2026 the versioned assets were created on https://tce-eng.dev.cloud.processmaker.net: scripts 227–242, screens 433–489, process credit-deal-notification (83), and process credit-deal-process (84). Publication does not change the percentages above. The package classes, the Vue bundle, the acd_* migration, and the seed data were not installed with those assets, so a case still cannot run end to end. The Send Email task’s pm:config screenRef was stored as the named reference ${screen:credit-deal-notification-email}; the connector reads that JSON, so screen 464 still has to be selected on the task.</p>
+
+<footer>Credit Deal coverage report. Inventory of 358 PM3 assets. 317 resolved (88%), 41 open. Functionality 83% on the closing path and 66% including generated documents and the dashboard.</footer>
+</body>
+</html>

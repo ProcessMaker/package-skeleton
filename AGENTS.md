@@ -56,6 +56,7 @@ Copy this checklist and complete it in order:
 - [ ] 8. Record process_id / screen_id / script_id in workflow.md (not in git BPMN refs)
 - [ ] 9. PHPUnit for use cases + script wrappers
 - [ ] 10. Link root AGENTS.md
+- [ ] 11. Coverage report: follow [ai-docs/report.md](ai-docs/report.md)
 ```
 
 ### 1. Folders + ai-docs
