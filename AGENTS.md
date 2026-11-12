@@ -129,7 +129,9 @@ Do not use legacy `APP - APV3 - ...` screen titles.
 
 - `{slug}-transcript.xml` — TCO reviews extracted transcript
 - `{slug}-applicant.xml` — application / articulation (if in scope)
-- Reuse `documentation/bpmn/upload-transcript.xml` via CallActivity when upload is needed
+- **Design for readability:** keep the top-level graph as a short phase story (Capture → Validate → Review → …). Put the tasks, gateways, and flows of each phase inside an embedded `bpmn:subProcess` (same request). Use `bpmn:adHocSubProcess` / `bpmn:transaction` only when those semantics are needed. See [.agents/skills/pm4-sub-process/design.md](.agents/skills/pm4-sub-process/design.md).
+- **CallActivity** only when reusing another published process or needing a separate child request (e.g. shared `documentation/bpmn/upload-transcript.xml`). Do not create a child process merely to hide nodes — embed them instead.
+- Prefer [pm4-process](.agents/skills/pm4-process/SKILL.md) + [pm4-sub-process](.agents/skills/pm4-sub-process/SKILL.md) when authoring or editing BPMN with the AI.
 
 
 ### Screen quality gate
@@ -219,7 +221,7 @@ Example handoff:
 ## PHPUnit development
 If you need to run a phpunit test prefer to use:
 ```
-/usr/local/bin/phpunit vendor/processmaker/package-skeleton/{test_path}
+/usr/local/bin/phpunit vendor/processmaker/package-example4/{test_path}
 ```
 
 Test script tasks could have some special behavior, it usually expect to have a global variable $data and return an array, some tests for script task can be found at `tests/Unit/Documentation`
