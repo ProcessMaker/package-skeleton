@@ -117,11 +117,15 @@ When the use case needs a port, construct the adapter in the wrapper (`isset($po
 - Every screen item must include an item-level `inspector: []` when no inspector fields are defined; Screen Builder validation expects this array.
 - Use one `VueComponentRenderTemplate` for a simple screen, or multiple direct components/items when Screen Builder must insert or replace controls between sections.
 - Vue root: `resources/js/projects/{slug}/{camelOrPascalFolder}/{ScreenName}.vue`
-- Local children: `components/{Domain}{Section}.vue`; import them locally for internal composition. In `resources/js/designer/public-screen-components.json`, the parent entry must declare its direct children in nested `components`, and every child must also have an independent top-level `{ name, key }` entry. Register only the root with `registerPublicScreenComponent` in the applicable FORM/DISPLAY Screen Builder entrypoints (and package-wide when the screen runs outside Screen Builder).
-- Reuse `resources/js/projects/shared/` first when a control is used by 2+ screens; each domain still owns its business logic.
-- Before coding, document which sections are code-owned, slot-based, `contentVue` components, or separate Screen Builder items (see [custom-vue-components.md](./ai-docs/custom-vue-components.md)).
+- Local children: `components/{Domain}{Section}.vue`; import them locally for internal composition. In `resources/js/designer/public-screen-components.json`, the parent entry must declare its direct children in nested `components`, and every child must also have an independent top-level `{ name, key }` entry. Repeat recursively for nested child dependencies. The catalog is loaded by `ensureScreenComponentRegistry()` in the package’s screen-builder bundles (see [screen-builder.md](ai-docs/screen-builder.md)); do not require `package-plg` on the server.
+- Reuse `resources/js/projects/shared/` first when a control is used by 2+ screens; each domain still owns its business logic. Similar screens are references, not implementations.
+- Before coding, document the screen extension points: which sections are code-owned, slot-based, direct `contentVue` components, or separate Screen Builder items (see [custom-vue-components.md](ai-docs/custom-vue-components.md)).
 - New UUID per YAML control (`uuidgen`).
 - `handlerVue` maps process `$data` into the Vue `v-model`; guard `this.data` because Screen Builder may evaluate the handler before transient process data exists.
+
+Do not use legacy `APP - APV3 - ...` screen titles.
+
+**Screen Builder build (each package):** after Vue or catalog changes, run `npm run prod` and publish with `php artisan vendor:publish --tag={package-name} --force`. Domain SFCs live under `resources/js/projects/{camelSlug}/` (skeleton placeholder: `packageSkeleton`). Package reference: [ai-docs/screen-builder.md](ai-docs/screen-builder.md). Per-domain Vue inventory: [ai-docs/_template/architecture/frontend.md](ai-docs/_template/architecture/frontend.md) → `ai-docs/{slug}/architecture/frontend.md`.
 
 ### 5. BPMN
 
@@ -216,7 +220,9 @@ Script tasks usually expect a global `$data` and return an array. Script wrapper
 
 ## Cross-domain architecture
 
-- [Best code practices](./ai-docs/best-code-practices.md): **SonarQube must pass** on changed code, cognitive complexity ≤ 15, classes ≤ 20 methods.
+- [Best code practices](./ai-docs/best-code-practices.md): **SonarQube must pass** on changed code, cognitive complexity ≤ 15, classes ≤ 20 methods, and related quality expectations.
+- [Screen Builder package bundles](./ai-docs/screen-builder.md): catalog, Vite IIFE builds, publish path (no `package-plg` dependency).
+- [Custom Vue Components](./ai-docs/custom-vue-components.md): administration, Screen Builder runtime resolution, browser caching, security, and Screen Import/Export dependencies.
 - [Projects hexagonal organization](./ai-docs/hexagonal.md)
 - [Domain models](./ai-docs/models.md)
 - [Projects assets organization](./projects/AGENTS.md)

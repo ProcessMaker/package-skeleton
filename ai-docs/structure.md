@@ -10,10 +10,13 @@ ai-docs/{slug}/
 └── architecture/
     ├── database.md      # {prefix}_* tables, FKs
     ├── workflow.md      # BPMN path, tasks, screens, scripts, gateways
-    └── frontend.md      # Vue screens and shared components used
+    └── frontend.md      # domain inventory: roots/children, screens table, theme (template: ai-docs/_template/)
 ```
 
-Use a dedicated `ai-docs/{slug}/` tree, not a single mega-file. Index every new architecture doc from that domain `AGENTS.md`.
+- **Package-wide** Screen Builder mechanics (catalog, Vite bundles, publish): [screen-builder.md](./screen-builder.md).
+- **Per slug:** copy `ai-docs/_template/` to `ai-docs/{slug}/` and fill `architecture/frontend.md`; link `screen-builder.md` instead of duplicating build steps.
+
+Mirror High School: a dedicated `ai-docs/{slug}/` tree, not a single mega-file. Index every new architecture doc from `AGENTS.md`.
 
 Root `AGENTS.md` must link `./ai-docs/{slug}/AGENTS.md`.
 
@@ -60,9 +63,16 @@ database/migrations/                   # {prefix}_* tables
 
 ## Vue + Storybook
 
+Domain Vue uses **camelCase** folder names under `resources/js/projects/` (skeleton: `packageSkeleton`; `rename-project.php` rewrites to e.g. `demoLeave`).
+
 ```
-resources/js/projects/{slug}/
-├── shared/                            # domain-shared only if reused by 2+ screens
+resources/js/designer/
+├── public-screen-components.json
+├── screen-builder-form-components.js
+└── screen-builder-display-components.js
+resources/js/componentsDesigner/customComponents.js
+resources/js/projects/{camelSlug}/
+├── shared/                            # domain CAT2 only if reused by 2+ screens
 └── {screenFolder}/
     ├── {ScreenName}.vue
     ├── {ScreenName}.stories.js        # title: Projects/{Pascal}/...

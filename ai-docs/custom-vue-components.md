@@ -2,9 +2,11 @@
 
 Optional capability for packages created from Package Skeleton. Implement routes and controllers in **your** package slug (`{package-slug}`); this skeleton documents the pattern only — it does not ship the full administration stack by default.
 
+> **Package skeleton:** each PM4 package embeds `VueComponentRenderTemplate`, the catalog, and screen-builder IIFE builds locally. See [screen-builder.md](./screen-builder.md). The notes below apply to runtime behavior; administration DB APIs may live in optional packages such as `package-plg`.
+
 ## Purpose
 
-Allow administrators to replace selected Vue components used directly by a Screen (`contentVue`) without rebuilding the official Screen Builder bundle. The customization boundary is `VueComponentRenderTemplate`. Static imports inside an official SFC are not replaced.
+Allows administrators to replace selected Vue components used directly by a ProcessMaker Screen without modifying or rebuilding the official component. It also allows administrators to create DB-only Vue components for use in `contentVue`.
 
 Screen configuration example:
 

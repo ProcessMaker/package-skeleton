@@ -150,7 +150,7 @@
     <tr><td>Trade-ticket signatures</td><td>PM3 swapped the OR.02 and OR.11 validation variables. Each step now writes its own flag (DC_VALIDATE_OR2_SIGNATURE and DC_VALIDATE_OR11_SIGNATURE) and uses that task’s assignee, not the person who completed the previous task.</td></tr>
     <tr><td>Email attachments</td><td>NR-01, NR-05, and NR-09 point at generated documents that do not exist. The email is sent. The PDF is not.</td></tr>
     <tr><td>TR.5</td><td>In PM3 the condition is 1 == 2. It stays behind DC_COLLATERAL_QUESTIONNAIRE_ENABLED, which defaults to false.</td></tr>
-    <tr><td>Screen Builder and scripts</td><td>Load public/js/screen-builder-components.js on FORM and DISPLAY pages, and rebuild the php-nayra executor. The scripts use new classes that a script push does not copy.</td></tr>
+    <tr><td>Screen Builder and scripts</td><td>Run <code>npm run prod</code> so <code>public/js/screen-builder-form-components.js</code> and <code>screen-builder-display-components.js</code> publish with the package; rebuild the php-nayra executor when scripts use new PHP classes.</td></tr>
   </tbody>
 </table>
 
