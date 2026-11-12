@@ -33,8 +33,12 @@ cd my-package
 php rename-project.php my-package
 composer install
 npm install
-npm run dev
+npm run prod
 ```
+
+For Screen Builder screens (YAML + `VueComponentRenderTemplate`), place Vue SFCs under `resources/js/projects/packageSkeleton/`, register them in `resources/js/designer/public-screen-components.json`, then `npm run prod` and publish assets on ProcessMaker. See [ai-docs/screen-builder.md](ai-docs/screen-builder.md).
+
+`rename-project.php` also renames `packageSkeleton` → camelCase slug (e.g. `demoLeave`).
 
 ## Installation
 * Use `composer require processmaker/package-skeleton` to install the package.

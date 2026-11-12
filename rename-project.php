@@ -390,6 +390,10 @@ searchDirectoryFiles(getcwd() . '/', 'PackageSkeleton', $pascal, $replacedCount,
 $title = dashesToCamelCase($projectName, true, ' ');
 $info('Replacing ' . $bold('Package Skeleton') . ' → ' . $bold($title));
 searchDirectoryFiles(getcwd() . '/', 'Package Skeleton', $title, $replacedCount, $dim);
+
+$camel = dashesToCamelCase($projectName, false);
+$info('Replacing ' . $bold('packageSkeleton') . ' → ' . $bold($camel));
+searchDirectoryFiles(getcwd() . '/', 'packageSkeleton', $camel, $replacedCount, $dim);
 $ok("Updated {$replacedCount} file(s)");
 echo "\n";
 
