@@ -1,8 +1,8 @@
 # Best code practices
 
-Cross-project coding standards for package-plg. Prefer these when writing or refactoring code so SonarQube and review stay green.
+Cross-project coding standards for Package Skeleton (and packages created from it). Prefer these when writing or refactoring code so SonarQube and review stay green.
 
-**SOLID:** On every frontend and backend implementation, apply SOLID. Agent skill: [`.cursor/skills/apply-solid/SKILL.md`](../.cursor/skills/apply-solid/SKILL.md).
+**SOLID:** On every frontend and backend implementation, apply SOLID (single responsibility, open/closed, Liskov, interface segregation, dependency inversion).
 
 ## Sonar review (required)
 
@@ -21,7 +21,7 @@ Keep each function/method at cognitive complexity ≤ 15. When a method approach
 
 ## Use at most 3 returns in a function
 
-Functions should not contain too many return statements
+Functions should not contain too many return statements.
 
 ## Class size
 
@@ -38,9 +38,10 @@ Prefer optional chain expressions (`?.`) over nested null/undefined checks. They
 
 ## Related to code
 
-- Do not use unnecessary use of boolean literals in conditional expression. e.g. `condition ? true : false` when `condition` is already a boolean.
-- [S7744] Do not use unnecessary fallback objects should not be used when spreading in object literals.
+- Do not use unnecessary boolean literals in conditional expressions, e.g. `condition ? true : false` when `condition` is already a boolean.
+- [S7744] Do not use unnecessary fallback objects when spreading in object literals.
 
 ## Related to Vue components
+
 - Declare emits array for all emitted events.
 - Declare the props as object that include type of the properties.

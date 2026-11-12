@@ -155,7 +155,7 @@
 </table>
 
 <h2>Publication</h2>
-<p>On 10 November 2026 the versioned assets were created on https://tce-eng.dev.cloud.processmaker.net: scripts 227–242, screens 433–489, process credit-deal-notification (83), and process credit-deal-process (84). Publication does not change the percentages above. The package classes, the Vue bundle, the acd_* migration, and the seed data were not installed with those assets, so a case still cannot run end to end. The Send Email task’s pm:config screenRef was stored as the named reference ${screen:credit-deal-notification-email}; the connector reads that JSON, so screen 464 still has to be selected on the task.</p>
+<p>On 10 November 2026 the versioned assets were published to the PM4 instance set in package <code>.env</code> as <code>PM_BASE_URL</code> (configured at <code>composer create-project</code>): scripts 227–242, screens 433–489, process credit-deal-notification (83), and process credit-deal-process (84). Publication does not change the percentages above. The package classes, the Vue bundle, the acd_* migration, and the seed data were not installed with those assets, so a case still cannot run end to end. The Send Email task’s pm:config screenRef was stored as the named reference ${screen:credit-deal-notification-email}; the connector reads that JSON, so screen 464 still has to be selected on the task.</p>
 
 <footer>Credit Deal coverage report. Inventory of 358 PM3 assets. 317 resolved (88%), 41 open. Functionality 83% on the closing path and 66% including generated documents and the dashboard.</footer>
 </body>

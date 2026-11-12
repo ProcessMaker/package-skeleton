@@ -25,12 +25,12 @@ PM_SKILLS_PROFILE=migration NAYRA_SERVER=https://pm.example.com PM_SYNC_TOKEN=â€
 ```
 
 ## Development
-If you need to create a new ProcessMaker package run the following commands:
+Prefer `composer create-project` above. To rename a local clone:
 
 ```
-git clone https://github.com/ProcessMaker/package-skeleton.git
-cd package-skeleton
-php rename-project.php package-skeleton
+git clone https://github.com/ProcessMaker/package-skeleton.git my-package
+cd my-package
+php rename-project.php my-package
 composer install
 npm install
 npm run dev
