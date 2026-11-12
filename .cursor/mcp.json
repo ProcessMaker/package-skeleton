@@ -1,8 +1,12 @@
 {
   "mcpServers": {
-    "processmaker": {
+    "processmaker-processes": {
       "type": "http",
       "url": "__PROCESSMAKER_SERVER__/mcp/processes"
+    },
+    "processmaker-screens": {
+      "type": "http",
+      "url": "__PROCESSMAKER_SERVER__/mcp/screens"
     }
   }
 }

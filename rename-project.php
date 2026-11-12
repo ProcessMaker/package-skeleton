@@ -152,6 +152,76 @@ function dashesToCamelCase($string, $capitalizeFirstCharacter = false, $replace 
     return $str;
 }
 
+/**
+ * @return array<string, mixed>
+ */
+function buildMcpServersConfig(string $server): array
+{
+  $base = rtrim($server, '/');
+
+  return [
+    'mcpServers' => [
+      'processmaker-processes' => [
+        'type' => 'http',
+        'url' => $base . '/mcp/processes',
+      ],
+      'processmaker-screens' => [
+        'type' => 'http',
+        'url' => $base . '/mcp/screens',
+      ],
+    ],
+  ];
+}
+
+function writeJsonConfig(string $path, array $data): void
+{
+    $encoded = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    if ($encoded === false) {
+        return;
+    }
+    file_put_contents($path, $encoded . "\n");
+}
+
+function writeMcpConfig(string $projectRoot, string $server): void
+{
+    $mcp = buildMcpServersConfig($server);
+    writeJsonConfig($projectRoot . '/.mcp.json', $mcp);
+    writeJsonConfig($projectRoot . '/.cursor/mcp.json', $mcp);
+}
+
+function writeEnvExample(string $projectRoot, string $server): void
+{
+    $base = rtrim($server, '/');
+    $lines = [
+        '# ProcessMaker sync target (used by deploy scripts and local tooling).',
+        'PM_BASE_URL=' . $base,
+        'PM_SYNC_TOKEN=',
+        '',
+    ];
+    file_put_contents($projectRoot . '/.env.example', implode("\n", $lines));
+}
+
+function writeLocalEnv(string $projectRoot, string $server, string $token): void
+{
+    $base = rtrim($server, '/');
+    $lines = [
+        'PM_BASE_URL=' . $base,
+        'PM_SYNC_TOKEN=' . $token,
+        '',
+    ];
+    file_put_contents($projectRoot . '/.env', implode("\n", $lines));
+}
+
+function ensureMigrationDirectories(string $projectRoot): void
+{
+    foreach (['migration/inputs', 'migration/outputs'] as $dir) {
+        $path = $projectRoot . '/' . $dir;
+        if (!is_dir($path)) {
+            mkdir($path, 0755, true);
+        }
+    }
+}
+
 $hr('renaming');
 $info('Replacing ' . $bold('package-skeleton') . ' → ' . $bold($projectName));
 searchDirectoryFiles(getcwd() . '/', 'package-skeleton', $projectName, $replacedCount, $dim);
@@ -164,25 +234,6 @@ $title = dashesToCamelCase($projectName, true, ' ');
 $info('Replacing ' . $bold('Package Skeleton') . ' → ' . $bold($title));
 searchDirectoryFiles(getcwd() . '/', 'Package Skeleton', $title, $replacedCount, $dim);
 $ok("Updated {$replacedCount} file(s)");
-echo "\n";
-
-// ProcessMaker URL.
-$processmakerPlaceholder = '__PROCESSMAKER_' . 'SERVER__';
-$processmakerServer = trim((string) getenv('NAYRA_SERVER'));
-$hr('processmaker');
-if ($processmakerServer === '' && function_exists('stream_isatty') && stream_isatty(STDIN)) {
-    $processmakerServer = $ask('ProcessMaker Server URL (eg. https://pm.example.com): ');
-}
-
-if ($processmakerServer !== '') {
-    $server = rtrim($processmakerServer, '/');
-    $info('Setting server → ' . $bold($server));
-    $urlCount = 0;
-    searchDirectoryFiles(getcwd() . '/', $processmakerPlaceholder, $server, $urlCount, $dim);
-    $ok("Server URL written to {$urlCount} file(s)");
-} else {
-    $warn("No ProcessMaker URL provided; keeping '{$processmakerPlaceholder}' as is.");
-}
 echo "\n";
 
 // PM4 Skills.
@@ -260,6 +311,53 @@ if (!in_array($skillsProfile, ['migration', 'pm4'], true)) {
     }
 }
 
+// ProcessMaker target + MCP (shared by migration and PM4-only).
+$processmakerPlaceholder = '__PROCESSMAKER_' . 'SERVER__';
+$projectRoot = getcwd() . '/';
+$processmakerServer = trim((string) getenv('NAYRA_SERVER'));
+$syncToken = trim((string) getenv('PM_SYNC_TOKEN'));
+
+$hr('processmaker');
+if ($processmakerServer === '' && function_exists('stream_isatty') && stream_isatty(STDIN)) {
+    $processmakerServer = $ask('ProcessMaker Server URL (eg. https://pm.example.com): ');
+}
+
+$isInteractive = function_exists('stream_isatty') && stream_isatty(STDIN);
+if ($syncToken === '' && $isInteractive && $processmakerServer !== '') {
+    $syncToken = $ask('API token (Passport bearer for MCP/deploy; Enter to skip): ');
+}
+
+if ($processmakerServer !== '') {
+    $server = rtrim($processmakerServer, '/');
+    $info('Setting server → ' . $bold($server));
+    writeMcpConfig($projectRoot, $server);
+    $ok('Wrote .mcp.json and .cursor/mcp.json (processes + screens)');
+    writeEnvExample($projectRoot, $server);
+    $ok('Wrote .env.example');
+    if ($syncToken !== '') {
+        writeLocalEnv($projectRoot, $server, $syncToken);
+        $ok('Wrote .env with PM_BASE_URL and PM_SYNC_TOKEN');
+    } else {
+        $warn('No PM_SYNC_TOKEN; add it to .env before deploy or authorize MCP in the IDE.');
+    }
+    $urlCount = 0;
+    searchDirectoryFiles($projectRoot, $processmakerPlaceholder, $server, $urlCount, $dim);
+    if ($urlCount > 0) {
+        $ok("Replaced {$processmakerPlaceholder} in {$urlCount} other file(s)");
+    }
+} else {
+    $warn("No ProcessMaker URL provided; keeping '{$processmakerPlaceholder}' in templates.");
+}
+echo "\n";
+
+if ($skillsProfile === 'migration') {
+    $hr('migration');
+    ensureMigrationDirectories($projectRoot);
+    $ok('migration/inputs and migration/outputs are ready');
+    $info('Place PM3 exports in ' . $bold('migration/inputs/') . ' — see ' . $bold('ai-docs/migration/AGENTS.md'));
+    echo "\n";
+}
+
 if ($skillsProfile === '') {
     $warn('No skills profile provided; skipping skills installation.');
 } else {
@@ -285,4 +383,11 @@ if ($skillsProfile === '') {
 
 echo "\n";
 $hr();
-echo '  ' . $green('✦') . ' ' . $paint('1;97', 'Done') . $dim(" — {$projectName} is ready.") . "\n\n";
+echo '  ' . $green('✦') . ' ' . $paint('1;97', 'Done') . $dim(" — {$projectName} is ready.") . "\n";
+if ($processmakerServer !== '') {
+    $info('MCP: connect processmaker-processes and processmaker-screens in Cursor with your API token.');
+}
+if ($skillsProfile === 'migration') {
+    $info('Next: ai-docs/migration/AGENTS.md');
+}
+echo "\n";
