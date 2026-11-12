@@ -22,6 +22,7 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
+    emptyOutDir: false,
     outDir: 'public', // Set the public directory for output
     rollupOptions: {
       input: ['resources/js/package.js', 'resources/css/package.css'],

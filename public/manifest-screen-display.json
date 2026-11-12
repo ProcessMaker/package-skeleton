@@ -1,0 +1,7 @@
+{
+  "resources/js/designer/screen-builder-display-components.js": {
+    "file": "js/screen-builder-display-components.js",
+    "isEntry": true,
+    "src": "resources/js/designer/screen-builder-display-components.js"
+  }
+}

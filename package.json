@@ -10,8 +10,9 @@
     "development": "vite",
     "hot": "vite --host --port=3000",
     "lint": "eslint --fix  --ext .vue,.js resources/js",
-    "prod": "vite build",
-    "production": "vite build",
+    "build:screen-builder": "vite build -c vite.config.form.js && vite build -c vite.config.display.js",
+    "prod": "vite build && npm run build:screen-builder",
+    "production": "npm run prod",
     "storybook": "STORYBOOK=1 storybook dev -p 6006",
     "build-storybook": "STORYBOOK=1 storybook build",
     "test-storybook": "STORYBOOK=1 test-storybook",
@@ -38,6 +39,7 @@
     "postcss": "^8.4.35",
     "storybook": "^7.6.13",
     "storybook-addon-mock": "^4.3.0",
+    "vite-plugin-css-injected-by-js": "^3.5.1",
     "vue-template-compiler": "^2.6.14"
   },
   "dependencies": {
