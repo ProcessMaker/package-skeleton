@@ -4,6 +4,8 @@ This plugin can contain multiple projects.
 
 Do not invent tool names or a third deploy CLI.
 
+**Wizard option 1 (Migration):** after `composer create-project`, follow [ai-docs/migration/AGENTS.md](ai-docs/migration/AGENTS.md). MCP + `.env` are configured the same as option 2 (PM4 only).
+
 ## Before creating anything
 
 Ask only if missing:
