@@ -9,7 +9,7 @@ composer create-project --stability=dev processmaker/package-skeleton:dev-featur
 
 The post-install wizard asks for **Migration** or **PM4 only**, then **ProcessMaker URL**, **API token** (optional), writes `.mcp.json` (processes + screens), `.env.example`, and installs skills.
 
-Asset publish (after `composer require` + `artisan {slug}:install` on PM4), in order:
+Asset publish (PM4 core deploy APIs; set `PM_BASE_URL` / `PM_SYNC_TOKEN`), in order:
 
 ```bash
 php .agents/skills/upsert-script-php/scripts/upsert-script.php projects/{slug}/scripts/my-script.php

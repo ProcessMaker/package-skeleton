@@ -4,12 +4,12 @@
 /**
  * Create or update a ProcessMaker script by title using PHP file content.
  *
- * POST /api/1.0/package-skeleton/deploy-script
+ * POST /api/1.0/deploy-script (ProcessMaker core)
  *
  * Reads PM_BASE_URL and PM_SYNC_TOKEN from the package root .env
  */
 
-const ENDPOINT_PATH = '/api/1.0/package-skeleton/deploy-script';
+const ENDPOINT_PATH = '/api/1.0/deploy-script';
 
 $projectRoot = dirname(__DIR__, 4);
 $envPath = $projectRoot . '/.env';
