@@ -10,7 +10,7 @@ Place PM3 exports under `migration/inputs/` (`.pmx`, `.pmx2`, supporting files).
 
 1. Run `pm-analyze` (installed skill) → report under `migration/outputs/`.
 2. Generate assets under `projects/{slug}/` per root [AGENTS.md](../../AGENTS.md).
-3. Publish (package installed on PM4): script → screen → process:
+3. Publish (PM4 core deploy APIs): script → screen → process:
    - `upsert-script-php/scripts/upsert-script.php`
    - `upsert-screen-yaml/scripts/upsert-screen.php`
    - `upsert-process-bpmn/scripts/sync-process.php upsert …`

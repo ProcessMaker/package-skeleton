@@ -5,7 +5,7 @@
  * Create or update a ProcessMaker screen by title using YAML file content.
  *
  * The screen title is the YAML filename without extension.
- * POST /api/1.0/package-skeleton/deploy-screen
+ * POST /api/1.0/deploy-screen (ProcessMaker core)
  *
  * Reads PM_BASE_URL and PM_SYNC_TOKEN from the package-skeleton root .env
  *
@@ -14,7 +14,7 @@
  *   php scripts/upsert-screen.php path/to/military-transcript.yaml --host http://127.0.0.1:8000 --token TOKEN
  */
 
-const ENDPOINT_PATH = '/api/1.0/package-skeleton/deploy-screen';
+const ENDPOINT_PATH = '/api/1.0/deploy-screen';
 
 $projectRoot = dirname(__DIR__, 4);
 $envPath = $projectRoot . '/.env';

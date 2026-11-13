@@ -4,7 +4,7 @@
 /**
  * Fetch the latest ProcessMaker screen YAML by title.
  *
- * GET /api/1.0/package-skeleton/screen-yaml?name={title}
+ * GET /api/1.0/screen-yaml?name={title} (ProcessMaker core)
  *
  * Reads PM_BASE_URL and PM_SYNC_TOKEN from the package-skeleton root .env
  *
@@ -14,7 +14,7 @@
  *   php scripts/get-screen.php --name military-transcript --out path/to/military-transcript.yaml
  */
 
-const ENDPOINT_PATH = '/api/1.0/package-skeleton/screen-yaml';
+const ENDPOINT_PATH = '/api/1.0/screen-yaml';
 
 $projectRoot = dirname(__DIR__, 4);
 $envPath = $projectRoot . '/.env';

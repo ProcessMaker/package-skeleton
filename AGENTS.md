@@ -131,7 +131,7 @@ When the use case needs a port, construct the adapter in the wrapper (`isset($po
 
 ### 6. Publish
 
-**Precondition:** this package is installed on the target ProcessMaker instance (`composer require processmaker/{package-slug}` and `php artisan {package-slug}:install`). The upsert CLIs call `POST /api/1.0/{package-slug}/deploy-*` on **that server**, not on a git-only checkout. Set `PM_BASE_URL` and `PM_SYNC_TOKEN` in the package repo `.env` (wizard or `.env.example`).
+**Precondition:** target ProcessMaker core exposes deploy sync (`POST /api/1.0/deploy-script|deploy-screen|deploy-process`). Upsert CLIs call those core endpoints (BC aliases under `/api/1.0/package-skeleton/deploy-*` also work). Set `PM_BASE_URL` and `PM_SYNC_TOKEN` in the package repo `.env` (wizard or `.env.example`).
 
 Order (skills under `.agents/skills/`):
 
@@ -139,7 +139,7 @@ Order (skills under `.agents/skills/`):
 2. `upsert-screen-yaml` — `projects/{slug}/screens/{title}.yaml`
 3. `upsert-process-bpmn` — `projects/{slug}/bpmn/{name}.xml` (portable `${screen:}` / `${script:}` / `${process:}`)
 
-MCP (`/mcp/screens`, `/mcp/processes`) is optional for authoring; git → instance sync uses the deploy endpoints above unless the user asked for MCP-only publish.
+MCP (`/mcp/screens`, `/mcp/processes`) is optional for authoring; git → instance sync uses the core deploy endpoints above unless the user asked for MCP-only publish.
 
 ### Screen quality gate
 

@@ -4,10 +4,10 @@
 /**
  * Fetch the latest ProcessMaker script PHP by title.
  *
- * GET /api/1.0/package-skeleton/script-php?name={title}
+ * GET /api/1.0/script-php?name={title} (ProcessMaker core)
  */
 
-const ENDPOINT_PATH = '/api/1.0/package-skeleton/script-php';
+const ENDPOINT_PATH = '/api/1.0/script-php';
 
 $projectRoot = dirname(__DIR__, 4);
 $envPath = $projectRoot . '/.env';

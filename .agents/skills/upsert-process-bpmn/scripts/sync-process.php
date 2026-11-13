@@ -1,8 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-const DEPLOY_ENDPOINT = '/api/1.0/package-skeleton/deploy-process';
-const GET_ENDPOINT = '/api/1.0/package-skeleton/process-bpmn';
+const DEPLOY_ENDPOINT = '/api/1.0/deploy-process';
+const GET_ENDPOINT = '/api/1.0/process-bpmn';
 
 $projectRoot = dirname(__DIR__, 4);
 $envPath = $projectRoot . '/.env';

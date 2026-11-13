@@ -1,6 +1,6 @@
 ---
 name: upsert-script-php
-description: Create, update, or fetch a ProcessMaker script by title using a PHP file under projects/{slug}/scripts/. Uses this package deploy API or MCP when available. Filename without .php is the script title.
+description: Create, update, or fetch a ProcessMaker script by title using a PHP file under projects/{slug}/scripts/. Uses ProcessMaker core deploy API or MCP when available. Filename without .php is the script title.
 ---
 
 # Upsert or fetch script PHP
@@ -11,11 +11,11 @@ Auth: Bearer `PM_SYNC_TOKEN`, base `PM_BASE_URL` in package root `.env` (set by 
 
 ## Push
 
-`POST /api/1.0/{package-slug}/deploy-script`
+`POST /api/1.0/deploy-script` (ProcessMaker core)
 
 Body: `name` (title), `code` (full PHP).
 
-Requires this package installed on the ProcessMaker instance (`composer require` + `artisan {slug}:install`).
+BC alias: `POST /api/1.0/package-skeleton/deploy-script`.
 
 ```bash
 XDEBUG_MODE=off php .agents/skills/upsert-script-php/scripts/upsert-script.php projects/{slug}/scripts/{slug}-action.php
@@ -23,7 +23,7 @@ XDEBUG_MODE=off php .agents/skills/upsert-script-php/scripts/upsert-script.php p
 
 ## Pull
 
-`GET /api/1.0/{package-slug}/script-php?name={title}`
+`GET /api/1.0/script-php?name={title}`
 
 ```bash
 XDEBUG_MODE=off php .agents/skills/upsert-script-php/scripts/get-script.php projects/{slug}/scripts/{slug}-action.php
@@ -48,7 +48,6 @@ Do not reimplement HTTP. Do not `git commit` unless asked.
 Push:
 - [ ] 1. File under projects/{slug}/scripts/*.php
 - [ ] 2. basename == ProcessMaker script title
-- [ ] 3. Package installed on target PM4
-- [ ] 4. Run upsert-script.php
-- [ ] 5. Confirm action created or updated and script_id
+- [ ] 3. Run upsert-script.php
+- [ ] 4. Confirm action created or updated and script_id
 ```

@@ -61,7 +61,7 @@ GET    /api/1.0/{package-slug}/custom-vue-components/catalog
 GET    /api/1.0/{package-slug}/custom-vue-components/available
 ```
 
-Place controllers under `src/Http/Controllers/Api/` and register routes in `routes/api.php` with the same `{package-slug}` segment as deploy-script/screen/process.
+Place controllers under `src/Http/Controllers/Api/` and register routes in `routes/api.php` under your `{package-slug}` segment. Script/screen/process deploy sync lives in ProcessMaker core (`/api/1.0/deploy-*`).
 
 ## Runtime resolution (summary)
 
