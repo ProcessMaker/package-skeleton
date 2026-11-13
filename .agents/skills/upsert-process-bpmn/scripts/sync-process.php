@@ -35,12 +35,12 @@ if (!function_exists('curl_init')) {
 }
 
 if ($command === 'upsert') {
-    upsertProcess($target, $host, $token);
+    upsertProcess($target, $host, $token, $options);
 }
 
 getProcess($target, $host, $token, $options['output']);
 
-function upsertProcess(string $file, string $host, string $token): never
+function upsertProcess(string $file, string $host, string $token, array $options): never
 {
     $path = resolvePath($file);
     if (!is_file($path)) {
@@ -57,14 +57,21 @@ function upsertProcess(string $file, string $host, string $token): never
         fail("Could not read BPMN file: {$path}");
     }
 
+    $description = resolveProcessDescription($path, $options['description'] ?? null);
+
+    $payload = [
+        'name' => pathinfo($path, PATHINFO_FILENAME),
+        'bpmn' => $bpmn,
+    ];
+    if ($description !== null) {
+        $payload['description'] = $description;
+    }
+
     $response = request(
         'POST',
         rtrim($host, '/') . DEPLOY_ENDPOINT,
         $token,
-        [
-            'name' => pathinfo($path, PATHINFO_FILENAME),
-            'bpmn' => $bpmn,
-        ]
+        $payload
     );
 
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
@@ -163,13 +170,13 @@ function request(
 }
 
 /**
- * @return array{0: ?string, 1: ?string, 2: array{host: ?string, token: ?string, output: ?string}}
+ * @return array{0: ?string, 1: ?string, 2: array{host: ?string, token: ?string, output: ?string, description: ?string}}
  */
 function parseArguments(array $arguments): array
 {
     $command = array_shift($arguments);
     $target = null;
-    $options = ['host' => null, 'token' => null, 'output' => null];
+    $options = ['host' => null, 'token' => null, 'output' => null, 'description' => null];
 
     for ($index = 0; $index < count($arguments); $index++) {
         $argument = $arguments[$index];
@@ -199,6 +206,40 @@ function parseArguments(array $arguments): array
 function resolvePath(string $path): string
 {
     return str_starts_with($path, '/') ? $path : getcwd() . '/' . $path;
+}
+
+/**
+ * CLI --description, else projects/{slug}/process-description.txt when BPMN is under projects/{slug}/bpmn/.
+ */
+function resolveProcessDescription(string $bpmnPath, ?string $cliDescription): ?string
+{
+    if ($cliDescription !== null && $cliDescription !== '') {
+        return $cliDescription;
+    }
+
+    $canonical = realpath($bpmnPath) ?: $bpmnPath;
+    $projectsDir = DIRECTORY_SEPARATOR . 'projects' . DIRECTORY_SEPARATOR;
+  /** @var array{0: string, 1: string}|false $parts */
+    $parts = preg_match('#^(.*)' . preg_quote($projectsDir, '#') . '([^/]+)/bpmn/[^/]+$#', $canonical, $matches)
+        ? [$matches[1], $matches[2]]
+        : false;
+    if ($parts === false) {
+        return null;
+    }
+
+    $descriptionFile = $parts[0] . $projectsDir . $parts[1] . DIRECTORY_SEPARATOR . 'process-description.txt';
+    if (!is_file($descriptionFile)) {
+        return null;
+    }
+
+    $text = file_get_contents($descriptionFile);
+    if ($text === false) {
+        return null;
+    }
+
+    $text = trim($text);
+
+    return $text === '' ? null : $text;
 }
 
 function firstNonEmpty(?string ...$values): string
@@ -249,7 +290,7 @@ function usage(): never
 {
     fwrite(STDERR, <<<TEXT
 Usage:
-  php sync-process.php upsert path/to/process.bpmn [--host URL] [--token TOKEN]
+  php sync-process.php upsert path/to/process.bpmn [--host URL] [--token TOKEN] [--description TEXT]
   php sync-process.php get process-name [--output path/to/process.bpmn] [--host URL] [--token TOKEN]
 
 TEXT);

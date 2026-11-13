@@ -223,6 +223,49 @@ function ensureMigrationDirectories(string $projectRoot): void
 }
 
 /**
+ * Prepend migration guidance to root AGENTS.md when initializing for PM3 → PM4.
+ *
+ * @return bool True when the file was updated (or already had the intro).
+ */
+function prependMigrationAgentsIntro(string $projectRoot): bool
+{
+    $agentsPath = rtrim($projectRoot, '/\\') . '/AGENTS.md';
+    if (!is_file($agentsPath)) {
+        return false;
+    }
+
+    $existing = file_get_contents($agentsPath);
+    if ($existing === false) {
+        return false;
+    }
+
+    $marker = "# What to do\n";
+    if (str_starts_with(ltrim($existing), $marker)) {
+        return true;
+    }
+
+    $intro = <<<'MD'
+# What to do
+
+You are an ProcessMaker expert that will guide the migration of a ProcessMaker 3 process to ProcessMaker 4.
+
+Use the available skills to analyze the files provided by the user to understand the process or processes and its assets. Ask to the user the source files and the name of the project.
+
+Then based on that knowledge create a new project with name provided in the folder ai-docs, write as best as possible all its requirements base of the pmx2 file analysis of its process and assets. Then create the project using the [structure.md](./ai-docs/structure.md). Make sure it contain all the business logic defined and identified in the pmx or pmx2 file and the user interface as similar as possible, use the yaml and vue files as needed and create the required schema models. Make sure to include php unit tests and storybooks
+
+If you find .html files in the source folder, use them as email templates.
+If you find .pmt files in the source folder, use them as pmtables or report tables.
+If you find a .tar file in the source folder, use it as a plugin code, use it to complete the code, or copy the code, refactor it, include it in the current plugin or better use it as knowledge base to complete the scripts or php code in this project. After the creation and implementation of the process or processes generate a report with all the assets implemented and the list of assets no implemented to review manually with specification about why these were not implemented, also provide the percentage of the implementation.
+
+Important: When you create and deploy a process always add a brief summary of it to its description field.
+Important: If you use lanes in the bpmn, always add `<bpmn:collaboration>`
+
+MD;
+
+    return file_put_contents($agentsPath, $intro . $existing) !== false;
+}
+
+/**
  * Package-owned deploy skills that must survive `npx skills add`.
  *
  * @return list<string>
@@ -515,6 +558,11 @@ if ($skillsProfile === 'migration') {
     $hr('migration');
     ensureMigrationDirectories($projectRoot);
     $ok('migration/inputs and migration/outputs are ready');
+    if (prependMigrationAgentsIntro($projectRoot)) {
+        $ok('Prepended migration guidance to AGENTS.md');
+    } else {
+        $warn('Could not prepend migration guidance to AGENTS.md');
+    }
     $info('Place PM3 exports in ' . $bold('migration/inputs/') . ' — see ' . $bold('ai-docs/migration/AGENTS.md'));
     echo "\n";
 }

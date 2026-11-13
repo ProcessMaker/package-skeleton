@@ -9,7 +9,9 @@ Process `name` = BPMN filename without extension. Git BPMN keeps `${screen:…}`
 
 ## Push
 
-`POST /api/1.0/deploy-process` — body: `name`, `bpmn`
+`POST /api/1.0/deploy-process` — body: `name`, `bpmn`, optional `description`
+
+For `projects/{slug}/bpmn/*.xml`, the CLI loads `projects/{slug}/process-description.txt` when present (override with `--description`).
 
 BC alias: `POST /api/1.0/package-skeleton/deploy-process`.
 
