@@ -51,13 +51,12 @@ Copy this checklist and complete it in order:
 - [ ] 3. Thin ProcessMaker scripts (first use case only when there is a script; empty skeleton is OK)
 - [ ] 4. YAML screens + Vue + Storybook
 - [ ] 5. BPMN XML with ${screen:title} and ${script:title} (no numeric refs in git)
-- [ ] 6. Publish (see §6): package on PM4 first, then upsert-script-php → upsert-screen-yaml → upsert-process-bpmn
-- [ ] 7. If new src/ classes are used from a script, rebuild the php-nayra executor
+- [ ] 6. Beautify the created/updated bpmn processes
+- [ ] 7. Publish (see §6): package on PM4 first, then upsert-script-php → upsert-screen-yaml → upsert-process-bpmn
 - [ ] 8. Record process_id / screen_id / script_id in workflow.md (not in git BPMN refs)
 - [ ] 9. PHPUnit for use cases + script wrappers
 - [ ] 10. Link root AGENTS.md
-- [ ] 11. Beautify the created/updated bpmn processes
-- [ ] 12. Coverage report: follow [ai-docs/report.md](ai-docs/report.md)
+- [ ] 11. Coverage report: follow [ai-docs/report.md](ai-docs/report.md)
 ```
 
 ### 1. Folders + ai-docs

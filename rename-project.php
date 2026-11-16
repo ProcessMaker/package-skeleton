@@ -257,6 +257,7 @@ If you find .html files in the source folder, use them as email templates.
 If you find .pmt files in the source folder, use them as pmtables or report tables.
 If you find a .tar file in the source folder, use it as a plugin code, use it to complete the code, or copy the code, refactor it, include it in the current plugin or better use it as knowledge base to complete the scripts or php code in this project. After the creation and implementation of the process or processes generate a report with all the assets implemented and the list of assets no implemented to review manually with specification about why these were not implemented, also provide the percentage of the implementation.
 
+Important: After create a bpmn process use the skill pm4-bpmn-beautify to beautify the bpmn process.
 Important: When you create and deploy a process always add a brief summary of it to its description field.
 Important: If you use lanes in the bpmn, always add `<bpmn:collaboration>`
 
