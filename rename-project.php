@@ -443,6 +443,7 @@ echo "\n";
 // PM4 Skills.
 $pm4Skills = [
     'pm4-action-by-email',
+    'pm4-bpmn-beautify',
     'pm4-collection',
     'pm4-data-connector',
     'pm4-decision-table',
