@@ -49,10 +49,6 @@ class PackageServiceProvider extends ServiceProvider
             ->prefix('api/1.0')
             ->group(__DIR__ . '/../routes/api.php');
 
-        if (!$this->app->runningInConsole()) {
-            Route::pushMiddlewareToGroup('web', AddToMenus::class);
-        }
-
         $this->loadViewsFrom(__DIR__ . '/../resources/views/', 'package-skeleton');
 
         $this->publishes([
