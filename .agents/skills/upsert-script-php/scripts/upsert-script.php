@@ -14,10 +14,10 @@ const ENDPOINT_PATH = '/api/1.0/deploy-script';
 $projectRoot = dirname(__DIR__, 4);
 $envPath = $projectRoot . '/.env';
 
-[$phpFile, $hostOverride, $tokenOverride] = parseCliArgs(array_slice($argv, 1));
+[$phpFile, $hostOverride, $tokenOverride, $versionName] = parseCliArgs(array_slice($argv, 1));
 
 if ($phpFile === null) {
-    fwrite(STDERR, "Usage: php upsert-script.php path/to/script.php [--host URL] [--token TOKEN]\n");
+    fwrite(STDERR, "Usage: php upsert-script.php path/to/script.php [--host URL] [--token TOKEN] [--version-name TEXT]\n");
     exit(1);
 }
 
@@ -59,10 +59,14 @@ if ($code === false) {
 }
 
 $url = rtrim($host, '/') . ENDPOINT_PATH;
-$payload = json_encode([
+$body = [
     'name' => $name,
     'code' => $code,
-], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+];
+if ($versionName !== null && $versionName !== '') {
+    $body['version_name'] = $versionName;
+}
+$payload = json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
 $ch = curl_init($url);
 curl_setopt_array($ch, [
@@ -104,13 +108,14 @@ if (preg_match('/^use\s+ProcessMaker\\\\Package\\\\/m', $code) === 1) {
 exit(0);
 
 /**
- * @return array{0: ?string, 1: ?string, 2: ?string}
+ * @return array{0: ?string, 1: ?string, 2: ?string, 3: ?string}
  */
 function parseCliArgs(array $args): array
 {
     $phpFile = null;
     $host = null;
     $token = null;
+    $versionName = null;
 
     for ($i = 0; $i < count($args); $i++) {
         $arg = $args[$i];
@@ -122,6 +127,10 @@ function parseCliArgs(array $args): array
             $token = $args[++$i] ?? '';
             continue;
         }
+        if ($arg === '--version-name') {
+            $versionName = $args[++$i] ?? '';
+            continue;
+        }
         if (str_starts_with($arg, '--host=')) {
             $host = substr($arg, 7);
             continue;
@@ -130,12 +139,16 @@ function parseCliArgs(array $args): array
             $token = substr($arg, 8);
             continue;
         }
+        if (str_starts_with($arg, '--version-name=')) {
+            $versionName = substr($arg, 15);
+            continue;
+        }
         if ($phpFile === null && !str_starts_with($arg, '--')) {
             $phpFile = $arg;
         }
     }
 
-    return [$phpFile, $host, $token];
+    return [$phpFile, $host, $token, $versionName];
 }
 
 function resolvePath(string $path, string $cwd): string

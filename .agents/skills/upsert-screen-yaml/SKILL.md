@@ -9,7 +9,7 @@ Title = YAML basename. Auth via package root `.env` (`PM_BASE_URL`, `PM_SYNC_TOK
 
 ## Push
 
-`POST /api/1.0/deploy-screen` — body: `name`, `yml_content`
+`POST /api/1.0/deploy-screen` — body: `name`, `yml_content`, and on **update** required `version_name` (maps to `package-versions` **Version History** `subject`, same as the UI “Version Name” on publish)
 
 BC alias: `POST /api/1.0/package-skeleton/deploy-screen`.
 
