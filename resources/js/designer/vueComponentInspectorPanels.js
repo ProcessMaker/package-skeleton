@@ -1,7 +1,7 @@
 // Keep the host's grouping for other controls; only merge this control's panels.
 export default function mergeVueComponentInspectorPanels(manager) {
   const builder = manager.$refs?.builder;
-  if (!builder || typeof builder.getInspectorFields !== 'function' || builder.plgVueInspectorMerged) return;
+  if (!builder || typeof builder.getInspectorFields !== 'function' || builder.vueInspectorPanelsMerged) return;
 
   const original = builder.getInspectorFields.bind(builder);
   builder.getInspectorFields = (accordion) => {
@@ -12,5 +12,5 @@ export default function mergeVueComponentInspectorPanels(manager) {
     const variable = builder.accordions.find((panel) => panel.name === 'Variable');
     return [...(variable ? original(variable) : []), ...original(accordion)];
   };
-  builder.plgVueInspectorMerged = true;
+  builder.vueInspectorPanelsMerged = true;
 }

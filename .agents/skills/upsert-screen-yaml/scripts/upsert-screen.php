@@ -10,8 +10,8 @@
  * Reads PM_BASE_URL and PM_SYNC_TOKEN from the package-skeleton root .env
  *
  * Usage:
- *   php scripts/upsert-screen.php path/to/military-transcript.yaml
- *   php scripts/upsert-screen.php path/to/military-transcript.yaml --host http://127.0.0.1:8000 --token TOKEN
+ *   php scripts/upsert-screen.php path/to/example-screen.yaml
+ *   php scripts/upsert-screen.php path/to/example-screen.yaml --host http://127.0.0.1:8000 --token TOKEN
  */
 
 const ENDPOINT_PATH = '/api/1.0/deploy-screen';
