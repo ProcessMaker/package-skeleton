@@ -35,7 +35,10 @@ src/Projects/{Pascal}/
   Application/
   Infrastructure/
 
-resources/js/projects/{slug}/{screenFolder}/{ScreenName}.vue
+resources/js/projects/shared/                        # plugin-wide, reused by 2+ projects
+resources/js/projects/{camelSlug}/shared/            # project-wide, reused by 2+ screens
+resources/js/projects/{camelSlug}/{screenFolder}/{ScreenName}.vue
+resources/js/projects/{camelSlug}/{screenFolder}/components/
 
 tests/Unit/Projects/{Pascal}/
 tests/Unit/Documentation/
@@ -116,16 +119,53 @@ When the use case needs a port, construct the adapter in the wrapper (`isset($po
 - A domain-specific root Vue component composed from local child components. The root owns domain coordination; child components own distinct controls or sections.
 - Every screen item must include an item-level `inspector: []` when no inspector fields are defined; Screen Builder validation expects this array.
 - Use one `VueComponentRenderTemplate` for a simple screen, or multiple direct components/items when Screen Builder must insert or replace controls between sections.
-- Vue root: `resources/js/projects/{slug}/{camelOrPascalFolder}/{ScreenName}.vue`
-- Local children: `components/{Domain}{Section}.vue`; import them locally for internal composition. In `resources/js/designer/public-screen-components.json`, the parent entry must declare its direct children in nested `components`, and every child must also have an independent top-level `{ name, key }` entry. Repeat recursively for nested child dependencies. The catalog is loaded by `ensureScreenComponentRegistry()` in the package’s screen-builder bundles (see [screen-builder.md](ai-docs/screen-builder.md)).
-- Reuse `resources/js/projects/shared/` first when a control is used by 2+ screens; each domain still owns its business logic. Similar screens are references, not implementations.
+- Vue layout follows [§4.1 Vue layout](#41-vue-layout-plugin--project--screen); register components per [§4.2](#42-register-vue-components).
 - Before coding, document the screen extension points: which sections are code-owned, slot-based, direct `contentVue` components, or separate Screen Builder items (see [custom-vue-components.md](ai-docs/custom-vue-components.md)).
 - New UUID per YAML control (`uuidgen`).
 - `handlerVue` maps process `$data` into the Vue `v-model`; guard `this.data` because Screen Builder may evaluate the handler before transient process data exists.
+- Every screen YAML includes a non-empty `preview_presets` list. Each item is `title` plus `data`, and `data` is a JSON **string** (`'{}'` or `'{"field":"value"}'`), not a nested mapping. Cover empty/start, the happy path, and each major UI branch. `upsert-screen-yaml` persists them; Screen Builder → Preview switches between them.
 
 Do not use legacy `APP - APV3 - ...` screen titles.
 
-**Screen Builder build (each package):** after Vue or catalog changes, run `npm run prod` and publish with `php artisan vendor:publish --tag={package-name} --force`. Domain SFCs live under `resources/js/projects/{camelSlug}/` (skeleton placeholder: `packageSkeleton`). Package reference: [ai-docs/screen-builder.md](ai-docs/screen-builder.md). Per-domain Vue inventory: [ai-docs/_template/architecture/frontend.md](ai-docs/_template/architecture/frontend.md) → `ai-docs/{slug}/architecture/frontend.md`.
+Package reference: [ai-docs/screen-builder.md](ai-docs/screen-builder.md). Per-project Vue inventory: [ai-docs/_template/architecture/frontend.md](ai-docs/_template/architecture/frontend.md) → `ai-docs/{slug}/architecture/frontend.md`.
+
+#### 4.1 Vue layout (plugin → project → screen)
+
+A plugin (this package) holds several projects; each project is one process (`projects/{slug}/`). Vue code mirrors that hierarchy with three levels of reuse:
+
+Concrete layout (`project-name` / intake screen). `shared` and `components` are literal directory names:
+
+```
+resources/js/projects/
+├── shared/                              # plugin-wide, only when 2+ projects use it
+└── projectName/
+    ├── shared/components/               # only when 2+ screens of this project use it
+    └── intake/
+        ├── ProjectNameIntake.vue        # root mounted from YAML contentVue
+        ├── ProjectNameIntake.stories.js # Storybook: Projects/ProjectName/Intake
+        └── components/                  # local children, only when one exists
+            └── ProjectNameIntakeHeader.vue
+```
+
+- Screen mapping: `projects/{slug}/screens/{slug}-{purpose}.yaml` → `resources/js/projects/{camelSlug}/{purposeCamel}/{Pascal}{PurposePascal}.vue`. Example: `project-name-intake.yaml` → `resources/js/projects/projectName/intake/ProjectNameIntake.vue`.
+- **Create a directory only when a file goes inside it.** Do not scaffold empty `components/`, `composables/`, `api/`, or `styles/`. A screen with no local child is just the root `.vue` and its story.
+- **Never create a directory named `{components}`, `{shared}`, or `{composables}`.** Those words are not placeholders. On zsh, `mkdir {components}` does not expand and the braces become part of the name. Write `mkdir components`.
+- Start every component inside its screen folder. Promote it to `{camelSlug}/shared/` when a second screen of the same project needs it, and to `projects/shared/` when a second project needs it. Shared components stay generic; business rules stay in the project.
+- Similar screens in other projects are references, not implementations: do not import another project's screen folder; promote the piece to `projects/shared/` instead.
+- Root components own domain coordination; children own distinct controls or sections (`{Pascal}{Section}.vue`).
+- **Vue components created while authoring screens with the ProcessMaker MCP (or any skill) always go in this package's project folder above.** Never create or register them in `package-plg` or any other package; the Screen Builder control, catalog, and bundles ship with this package.
+
+#### 4.2 Register Vue components
+
+`resources/js/componentsDesigner/customComponents.js` bundles every `resources/js/projects/**/*.vue`; the catalog decides which ones Screen Builder exposes. After adding or changing components:
+
+1. Register each component used from YAML in `resources/js/designer/public-screen-components.json` as `{ "name", "key" }`, with `key` = `@/projects/{camelSlug}/{screenFolder}/{ScreenName}.vue` (or the `shared/` path).
+2. When a root declares children for Screen Builder, list its **direct** children in a nested `components` array **and** add a separate top-level `{ name, key }` row for each child. Repeat recursively for nested children. Children imported only inside a `.vue` file do not need catalog rows.
+3. Build: `npm run prod` from the package root (Vite main build + FORM/DISPLAY IIFE bundles).
+4. Publish on the ProcessMaker host: `php artisan vendor:publish --tag={package-name} --force`, then hard-refresh Screen Builder.
+5. Only then create or update the screen (`upsert-screen-yaml` or Screens MCP) with `components` entries copied from the catalog. A missing key fails at runtime with `No SFC bundled for <key>`.
+
+The catalog is loaded by `ensureScreenComponentRegistry()` in this package's screen-builder bundles (see [screen-builder.md](ai-docs/screen-builder.md)); `package-plg` is not required on the server.
 
 ### 5. BPMN
 
@@ -167,7 +207,10 @@ Before publishing or handing off a new screen:
 | BPMN file | `{slug}-{purpose}.xml` | `project-name-intake.xml` |
 | Script file/title | `{slug}-{action}.php` | `project-name-save-record.php` |
 | Screen YAML | `{slug}-{purpose}.yaml` | `project-name-intake.yaml` |
-| Vue folder | camelCase or Pascal matching peers | `intakeForm/` |
+| Vue project folder | camelCase of slug | `resources/js/projects/projectName/` |
+| Vue screen folder | camelCase of YAML purpose | `resources/js/projects/projectName/intake/` |
+| Vue screen root | `{Pascal}{PurposePascal}.vue` | `ProjectNameIntake.vue` |
+| Catalog key | `@/projects/{camelSlug}/...` | `@/projects/projectName/intake/ProjectNameIntake.vue` |
 | Storybook | `Projects/{Pascal}/...` | `Projects/ProjectName/Intake` |
 | DB tables | `{prefix}_*` | `ahs_records` |
 | PHP locals | camelCase words, not loop letters | `$institutionId` not `$instCode` / `$x` |
@@ -183,6 +226,8 @@ Before publishing or handing off a new screen:
 - Store processes only in Modeler (BPMN XML is the versioned artifact)
 - Patch numeric `pm:scriptRef` / `pm:screenRef` into git BPMN after deploy
 - Create ad-hoc Storybook top-level groups
+- Create or register screen Vue components in `package-plg` (or any package other than this one)
+- Import one project's screen components from another project; promote to `resources/js/projects/shared/`
 - Write skills or docs under `~/.cursor/skills-cursor/`
 
 ## Storybook organization

@@ -19,12 +19,13 @@ resources/js/designer/
   screen-builder-display-components.js
   componentsConfig.js              # VueComponentRenderTemplate control definition
 resources/js/componentsDesigner/
-  customComponents.js              # import.meta.glob → resolveDeclaredComponents
+  customComponents.js              # import.meta.glob('../projects/**/*.vue') → resolveDeclaredComponents
   publicScreenComponents.js
 resources/js/components/screen-builder/freeEditor/
   RenderTemplate.js
   VueComponentEditor.vue
-resources/js/projects/{camelSlug}/   # skeleton: packageSkeleton
+resources/js/projects/shared/        # plugin-wide components (2+ projects)
+resources/js/projects/{camelSlug}/   # one per project: shared/ + {screenFolder}/
 public/js/
   screen-builder-form-components.js  # Vite IIFE output
   screen-builder-display-components.js
@@ -50,13 +51,15 @@ When a root SFC declares local children for Screen Builder (`components` in YAML
 1. The root, with `"components": [ { "name", "key" }, … ]` for **direct** children only.
 2. A **separate** top-level row for every child (and nested catalog child) so the bundle includes that SFC.
 
-The glob in `customComponents.js` must cover every keyed file. A missing file causes runtime error: `No SFC bundled for <key>`.
+The glob in `customComponents.js` covers every `.vue` under `resources/js/projects/`. A key pointing to a missing file causes runtime error: `No SFC bundled for <key>`.
 
-`rename-project.php` rewrites `packageSkeleton` → `{camelSlug}` (e.g. `demoLeave`) and `package-skeleton` → `{kebab-package}`.
+Folder layout, promotion rules (screen → project `shared/` → plugin `shared/`), and step-by-step registration: root [AGENTS.md](../AGENTS.md) §4.1–4.2. Vue components created while authoring screens (including through the ProcessMaker Screens MCP) always live in this package, never in `package-plg`.
 
 ## YAML and handlerVue
 
 Prefer one `VueComponentRenderTemplate` per simple screen: set `contentVue` / `handlerVue` and `components` with `{ name, key }` for catalog roots.
+
+Preview and request runtime mount `VueComponentRenderTemplate` directly and pass `components` as that raw `{ name, key }` list; design mode (`VueComponentEditor`) passes an already resolved map. `freeEditor/RenderTemplate.js` accepts both and resolves lists through the bundled catalog (`resolveDeclaredComponents`). If a screen renders in design mode but is blank in Preview with `Unknown custom element` / `Invalid value for option "components"` in the console, this resolution is missing. Regression story: `stories/RenderTemplate.stories.js` (`Components/ScreenBuilder/RenderTemplate`).
 
 In `handlerVue`, **guard** `this.data` before assigning defaults — Screen Builder may evaluate the handler before transient process data exists:
 
@@ -75,6 +78,8 @@ return {
 ```
 
 Every YAML control item needs `inspector: []` when no inspector fields are defined (Screen Builder validation).
+
+Screen YAML also carries `preview_presets` next to `config` / `computed` / `watchers`. Each preset is `{ title, data }` and `data` is a JSON string. Deploy (`upsert-screen-yaml`) stores them on the published screen; Screen Builder → Preview lists them. Cover empty/start, the happy path, and each major UI branch.
 
 ## Build and publish
 
@@ -114,7 +119,7 @@ Keep **project-specific** facts in `ai-docs/{slug}/architecture/frontend.md` (us
 | --- | --- |
 | Components | Table: story group → root Vue → children |
 | Screens | Optional: mirror `AGENTS.md` screen title → YAML → Vue path |
-| Theme | Domain CSS under `resources/js/projects/{camelSlug}/shared/` |
+| Theme | Project CSS under `resources/js/projects/{camelSlug}/shared/styles/` |
 | Notes | One-off UX or data-binding quirks |
 
 Do **not** duplicate this file’s build/layout/catalog rules in every domain doc — link here instead.

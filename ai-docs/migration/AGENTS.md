@@ -9,7 +9,7 @@ Place PM3 exports under `migration/inputs/` (`.pmx`, `.pmx2`, supporting files).
 ## Flow
 
 1. Run `pm-analyze` (installed skill) → report under `migration/outputs/`.
-2. Generate assets under `projects/{slug}/` per root [AGENTS.md](../../AGENTS.md).
+2. Generate assets under `projects/{slug}/` per root [AGENTS.md](../../AGENTS.md). Screen Vue components go in this package under `resources/js/projects/{camelSlug}/` (root AGENTS.md §4.1–4.2), never in `package-plg`.
 3. Publish (PM4 core deploy APIs): script → screen → process:
    - `upsert-script-php/scripts/upsert-script.php`
    - `upsert-screen-yaml/scripts/upsert-screen.php`

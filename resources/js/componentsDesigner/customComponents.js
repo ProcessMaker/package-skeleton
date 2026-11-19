@@ -2,7 +2,7 @@ import catalog from '../designer/public-screen-components.json';
 import publicScreenComponentKey from './publicScreenComponents';
 
 const modules = {
-  ...import.meta.glob('../projects/packageSkeleton/**/*.vue', { eager: true }),
+  ...import.meta.glob('../projects/**/*.vue', { eager: true }),
 };
 
 const customComponents = [];
