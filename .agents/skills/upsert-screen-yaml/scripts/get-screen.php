@@ -9,9 +9,9 @@
  * Reads PM_BASE_URL and PM_SYNC_TOKEN from the package-skeleton root .env
  *
  * Usage:
- *   php scripts/get-screen.php path/to/military-transcript.yaml
- *   php scripts/get-screen.php --name military-transcript
- *   php scripts/get-screen.php --name military-transcript --out path/to/military-transcript.yaml
+ *   php scripts/get-screen.php path/to/example-screen.yaml
+ *   php scripts/get-screen.php --name example-screen
+ *   php scripts/get-screen.php --name example-screen --out path/to/example-screen.yaml
  */
 
 const ENDPOINT_PATH = '/api/1.0/screen-yaml';

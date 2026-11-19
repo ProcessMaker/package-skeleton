@@ -266,7 +266,7 @@ Script tasks usually expect a global `$data` and return an array. Script wrapper
 ## Cross-domain architecture
 
 - [Best code practices](./ai-docs/best-code-practices.md): **SonarQube must pass** on changed code, cognitive complexity ≤ 15, classes ≤ 20 methods, and related quality expectations.
-- [Screen Builder package bundles](./ai-docs/screen-builder.md): catalog, Vite IIFE builds, publish path (no `package-plg` dependency).
+- [Screen Builder package bundles](./ai-docs/screen-builder.md): catalog, Vite IIFE builds, publish path.
 - [Custom Vue Components](./ai-docs/custom-vue-components.md): administration, Screen Builder runtime resolution, browser caching, security, and Screen Import/Export dependencies.
 - [Projects hexagonal organization](./ai-docs/hexagonal.md)
 - [Domain models](./ai-docs/models.md)

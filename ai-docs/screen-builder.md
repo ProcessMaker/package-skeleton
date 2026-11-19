@@ -1,6 +1,6 @@
 # Screen Builder and package frontend (all domains)
 
-Reference for agents and humans: how each ProcessMaker **package** ships FORM/DISPLAY Vue screens without `package-plg` on the server.
+Reference for agents and humans: how each ProcessMaker **package** ships FORM/DISPLAY Vue screens, with no additional server-side package required.
 
 Per-domain inventories (which screen maps to which root SFC, Storybook groups, theme CSS) belong in `ai-docs/{slug}/architecture/frontend.md` — start from [`ai-docs/_template/architecture/frontend.md`](./_template/architecture/frontend.md).
 

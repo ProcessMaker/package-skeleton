@@ -2,7 +2,7 @@
 
 Optional capability for packages created from Package Skeleton. Implement routes and controllers in **your** package slug (`{package-slug}`); this skeleton documents the pattern only — it does not ship the full administration stack by default.
 
-> **Package skeleton:** each PM4 package embeds `VueComponentRenderTemplate`, the catalog, and screen-builder IIFE builds locally. See [screen-builder.md](./screen-builder.md). The notes below apply to runtime behavior. Code-owned SFCs always live in this package under `resources/js/projects/` (root [AGENTS.md](../AGENTS.md) §4.1); never create them in `package-plg`.
+> **Package skeleton:** each PM4 package embeds `VueComponentRenderTemplate`, the catalog, and screen-builder IIFE builds locally. See [screen-builder.md](./screen-builder.md). The notes below apply to runtime behavior; administration DB APIs may live in optional packages. Code-owned SFCs always live in this package under `resources/js/projects/` (root [AGENTS.md](../AGENTS.md) §4.1); never create them in `package-plg`.
 
 ## Purpose
 
