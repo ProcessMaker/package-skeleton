@@ -63,26 +63,26 @@ database/migrations/                   # {prefix}_* tables
 
 ## Vue + Storybook
 
-Domain Vue uses **camelCase** folder names under `resources/js/projects/` (skeleton: `packageSkeleton`; `rename-project.php` rewrites to e.g. `demoLeave`).
+One package (plugin) holds several projects (processes). Vue mirrors that: plugin-wide shared → project → screen. Folder names are **camelCase** (`project-name` → `projectName`). Rules for promotion and registration: root [AGENTS.md](../AGENTS.md) §4.1–4.2.
+
+`shared` and `components` are literal directory names. Create `components/`, `composables/`, `api/`, or `styles/` only when a file goes inside. Never `mkdir {components}` — zsh keeps the braces in the folder name.
 
 ```
 resources/js/designer/
 ├── public-screen-components.json
 ├── screen-builder-form-components.js
 └── screen-builder-display-components.js
-resources/js/componentsDesigner/customComponents.js
-resources/js/projects/{camelSlug}/
-├── shared/                            # domain CAT2 only if reused by 2+ screens
-└── {screenFolder}/
-    ├── {ScreenName}.vue
-    ├── {ScreenName}.stories.js        # title: Projects/{Pascal}/...
-    ├── components/
-    ├── composables/
-    ├── api/
-    └── config/
+resources/js/componentsDesigner/customComponents.js   # bundles resources/js/projects/**/*.vue
+resources/js/projects/
+├── shared/                            # plugin-wide, reused by 2+ projects
+└── projectName/                       # camelCase of the project slug
+    ├── shared/components/             # reused by 2+ screens of this project
+    └── intake/                        # one folder per screen
+        ├── ProjectNameIntake.vue
+        ├── ProjectNameIntake.stories.js
+        └── components/                # local children, only when one exists
+            └── ProjectNameIntakeHeader.vue
 ```
-
-Package-wide shared UI: `resources/js/projects/shared/`.
 
 ## Tests
 

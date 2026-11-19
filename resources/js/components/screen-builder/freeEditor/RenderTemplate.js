@@ -1,3 +1,22 @@
+import {
+  ensureScreenComponentRegistry,
+  resolveDeclaredComponents,
+} from '../../../componentsDesigner/customComponents';
+
+/**
+ * Screen Builder Preview and request runtime mount this renderer with `components`
+ * exactly as stored on the screen: a list of `{ name, key, override? }`. Design mode
+ * (VueComponentEditor) passes an already resolved name -> component map instead.
+ * Vue only accepts a map, so lists are resolved through the bundled catalog here.
+ */
+function toComponentMap(declared) {
+  if (!Array.isArray(declared)) return declared || {};
+  ensureScreenComponentRegistry();
+  return resolveDeclaredComponents(
+    declared.map(({ name, key, override }) => ({ name, key: (override && override.key) || key })),
+  );
+}
+
 export default {
   name: 'VueComponentRenderTemplate',
   inheritAttrs: false,
@@ -39,7 +58,7 @@ export default {
       mixins: [
         newMixin,
       ],
-      components: this.components || {},
+      components: toComponentMap(this.components),
       template: this.contentVue || '',
       data() {
         return {
