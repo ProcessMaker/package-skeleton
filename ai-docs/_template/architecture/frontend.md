@@ -19,7 +19,7 @@ If not already in `ai-docs/{slug}/AGENTS.md`:
 
 | Screen title | YAML | Vue root |
 | --- | --- | --- |
-| `{slug}-screen-name` | `projects/{slug}/screens/{slug}-screen-name.yaml` | `resources/js/projects/{camelSlug}/…/{Root}.vue` |
+| `{slug}-screen-name` | `projects/{slug}/screens/{slug}-screen-name.yaml` | `resources/js/projects/{camelSlug}/screenName/{Pascal}ScreenName.vue` |
 
 ## Screen Builder
 
@@ -27,8 +27,9 @@ FORM/DISPLAY YAML uses `VueComponentRenderTemplate` with `contentVue`, `handlerV
 
 ## Theme and shared UI
 
-- Shared tokens/CSS: `resources/js/projects/{camelSlug}/shared/` _(describe file, e.g. `{slug}Theme.css`)_
-- Reuse `resources/js/projects/shared/` only when the same control is truly cross-domain (CAT1).
+- Project-shared components (2+ screens of this project): `resources/js/projects/{camelSlug}/shared/components/`
+- Shared tokens/CSS: `resources/js/projects/{camelSlug}/shared/styles/` _(describe file, e.g. `{slug}Theme.css`)_
+- Plugin-shared components (2+ projects): `resources/js/projects/shared/` — list the ones this project uses.
 
 ## Build (this package)
 

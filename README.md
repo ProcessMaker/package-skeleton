@@ -36,9 +36,7 @@ npm install
 npm run prod
 ```
 
-For Screen Builder screens (YAML + `VueComponentRenderTemplate`), place Vue SFCs under `resources/js/projects/packageSkeleton/`, register them in `resources/js/designer/public-screen-components.json`, then `npm run prod` and publish assets on ProcessMaker. See [ai-docs/screen-builder.md](ai-docs/screen-builder.md).
-
-`rename-project.php` also renames `packageSkeleton` → camelCase slug (e.g. `demoLeave`).
+For Screen Builder screens (YAML + `VueComponentRenderTemplate`), place Vue SFCs under `resources/js/projects/{camelSlug}/{screenFolder}/` (shared pieces in `resources/js/projects/{camelSlug}/shared/` or plugin-wide `resources/js/projects/shared/`), register them in `resources/js/designer/public-screen-components.json`, then `npm run prod` and publish assets on ProcessMaker. See §4 of [AGENTS.md](AGENTS.md) and [ai-docs/screen-builder.md](ai-docs/screen-builder.md).
 
 ## Installation
 * Use `composer require processmaker/package-skeleton` to install the package.
