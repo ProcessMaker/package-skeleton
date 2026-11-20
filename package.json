@@ -16,9 +16,9 @@
     "build:screen-builder": "vite build -c vite.config.form.js && vite build -c vite.config.display.js",
     "prod": "vite build && npm run build:screen-builder",
     "production": "npm run prod",
-    "storybook": "STORYBOOK=1 storybook dev -p 6006",
+    "storybook": "STORYBOOK=1 storybook dev -p 7007",
     "build-storybook": "STORYBOOK=1 storybook build",
-    "test-storybook": "STORYBOOK=1 test-storybook",
+    "test-storybook": "STORYBOOK=1 test-storybook --url http://127.0.0.1:7007",
     "watch-poll": "vite build --watch",
     "watch": "vite build --watch"
   },

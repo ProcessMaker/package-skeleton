@@ -183,6 +183,8 @@ Order (skills under `.agents/skills/`):
 2. `upsert-screen-yaml` — `projects/{slug}/screens/{title}.yaml`
 3. `upsert-process-bpmn` — `projects/{slug}/bpmn/{name}.xml` (portable `${screen:}` / `${script:}` / `${process:}`)
 
+**Build output is part of the plugin.** ProcessMaker core installs a plugin with `git clone` + `composer install` + `{package-name}:install` and never runs `npm`. Run `npm run prod` and **commit `public/`** before pushing, otherwise Screen Builder fails with `No SFC bundled for <key>`.
+
 MCP (`/mcp/screens`, `/mcp/processes`) is optional for authoring; git → instance sync uses the core deploy endpoints above unless the user asked for MCP-only publish.
 
 ### Screen quality gate
@@ -255,10 +257,19 @@ List each relevant story as a markdown link whose label is the story export name
 
 ## PHPUnit development
 
-Prefer:
+This package has no standalone PHPUnit: tests extend ProcessMaker core's `Tests\TestCase`, so they run **inside core**, where the plugin lives in `storage/plugins/{package-name}`.
+
+Local core (plugin installed under `storage/plugins/`):
 
 ```
-/usr/local/bin/phpunit vendor/processmaker/package-skeleton/{test_path}
+./vendor/bin/phpunit storage/plugins/{package-name}/tests/{test_path}
+```
+
+Docker dev stack (`pm4_core` container, working dir `/core`):
+
+```
+docker exec -it --env-file <pm4-core>/compose/envs/app.env.testing pm4_core \
+  ./vendor/bin/phpunit storage/plugins/{package-name}/tests/{test_path}
 ```
 
 Script tasks usually expect a global `$data` and return an array. Script wrapper tests live under `tests/Unit/Documentation` when present.
