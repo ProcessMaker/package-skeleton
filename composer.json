@@ -25,6 +25,7 @@
         }
     },
     "scripts": {
+        "doctor": "@php setup/requirements.php",
         "cs": [
             "@php vendor/bin/php-cs-fixer fix --show-progress=dots --ansi --diff -vv 2>&1 | php php-cs-fixer-post.php",
             "@php vendor/bin/phpcbf",

@@ -90,6 +90,27 @@ if (!isset($argv[1])) {
     $argv[1] = basename(getcwd());
 }
 
+require_once __DIR__ . '/setup/requirements.php';
+
+$requirements = checkRequirements();
+$hr('requirements');
+printRequirementsTable($requirements);
+echo "\n";
+
+// Node and npx are needed during this wizard (`npx skills add`) and for Vite/Storybook,
+// so stop before renaming anything instead of ending up with a project without skills.
+$nodeToolsMissing = array_values(array_intersect(failedRequirements($requirements), ['node', 'npm', 'npx']));
+if ($nodeToolsMissing !== []) {
+    $warn('Missing or outdated: ' . implode(', ', $nodeToolsMissing) . ' (Node.js >= ' . REQUIRED_NODE_MAJOR . ' is required).');
+    $warn('Install Node.js, then run: php rename-project.php ' . basename(getcwd()));
+    echo "\n";
+    exit(1);
+}
+if (!requirementsPassed($requirements)) {
+    $warn('Some requirements are not met (' . implode(', ', failedRequirements($requirements)) . '). Continuing; run `composer doctor` for details.');
+    echo "\n";
+}
+
 $projectName = $argv[1];
 $hr('project');
 $info('Working directory: ' . $dim(getcwd()));
