@@ -56,7 +56,7 @@ npm run prod        # builds public/
 git add -A && git commit -m "Initial plugin" && git push -u origin main
 ```
 
-Then open **Admin › Plugins**, click **Plugin**, enter the repository URL (and username/token for a private repository), and click **Install**. To update later, push your changes and use the plugin's update action in the same page.
+Then open **Admin › Plugins**, click **Plugin**, enter the repository URL (and username/token for a private repository), and click **Save** (ProcessMaker then installs the plugin). To update later, push your changes and use the plugin's update action in the same page.
 
 The repository must contain the plugin (a `composer.json` at its root): installing an empty repository fails.
 

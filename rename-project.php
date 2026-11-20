@@ -754,10 +754,10 @@ $step = 1;
 echo '    ' . $step++ . '. npm install && npm run prod' . $dim('   (builds public/, which core does not build)') . "\n";
 if ($pluginRepo !== '') {
     echo '    ' . $step++ . '. Commit everything including ' . $bold('public/') . ' and push: git push -u origin ' . $pluginBranch . "\n";
-    echo '    ' . $step++ . '. Admin › Plugins › Install with ' . $bold($pluginRepo) . ' (branch ' . $pluginBranch . ')' . "\n";
+    echo '    ' . $step++ . '. Admin › Plugins › Plugin: enter ' . $bold($pluginRepo) . ' (branch ' . $pluginBranch . ') and click Save to install' . "\n";
 } else {
     echo '    ' . $step++ . '. Create an empty git repository named ' . $bold($projectName) . ', commit everything including ' . $bold('public/') . ' and push it' . "\n";
-    echo '    ' . $step++ . '. Admin › Plugins › Install with the repository URL' . "\n";
+    echo '    ' . $step++ . '. Admin › Plugins › Plugin: enter the repository URL and click Save to install' . "\n";
 }
 if ($processmakerServer !== '') {
     echo '    ' . $step++ . '. MCP (OAuth): authorize the 4 ProcessMaker servers in Claude Code, Cursor (.cursor/mcp.json) or VS Code (.vscode/mcp.json)' . "\n";
