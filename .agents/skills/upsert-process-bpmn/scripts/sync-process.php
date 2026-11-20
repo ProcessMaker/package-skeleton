@@ -66,6 +66,10 @@ function upsertProcess(string $file, string $host, string $token, array $options
     if ($description !== null) {
         $payload['description'] = $description;
     }
+    $versionName = $options['version-name'] ?? null;
+    if (is_string($versionName) && $versionName !== '') {
+        $payload['version_name'] = $versionName;
+    }
 
     $response = request(
         'POST',
@@ -170,13 +174,19 @@ function request(
 }
 
 /**
- * @return array{0: ?string, 1: ?string, 2: array{host: ?string, token: ?string, output: ?string, description: ?string}}
+ * @return array{0: ?string, 1: ?string, 2: array{host: ?string, token: ?string, output: ?string, description: ?string, version-name: ?string}}
  */
 function parseArguments(array $arguments): array
 {
     $command = array_shift($arguments);
     $target = null;
-    $options = ['host' => null, 'token' => null, 'output' => null, 'description' => null];
+    $options = [
+        'host' => null,
+        'token' => null,
+        'output' => null,
+        'description' => null,
+        'version-name' => null,
+    ];
 
     for ($index = 0; $index < count($arguments); $index++) {
         $argument = $arguments[$index];
@@ -290,7 +300,7 @@ function usage(): never
 {
     fwrite(STDERR, <<<TEXT
 Usage:
-  php sync-process.php upsert path/to/process.bpmn [--host URL] [--token TOKEN] [--description TEXT]
+  php sync-process.php upsert path/to/process.bpmn [--host URL] [--token TOKEN] [--description TEXT] [--version-name TEXT]
   php sync-process.php get process-name [--output path/to/process.bpmn] [--host URL] [--token TOKEN]
 
 TEXT);

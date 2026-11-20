@@ -11,7 +11,7 @@ Auth: Bearer `PM_SYNC_TOKEN`, base `PM_BASE_URL` in package root `.env` (set by 
 
 ## Push
 
-`POST /api/1.0/deploy-script` (ProcessMaker core)
+`POST /api/1.0/deploy-script` — on **update**, required `version_name` → Version History `subject` (package-versions)
 
 Body: `name` (title), `code` (full PHP).
 
