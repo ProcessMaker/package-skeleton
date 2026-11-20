@@ -4,6 +4,9 @@
   "description": "Package skeleton to start a develop in ProcessMaker 4",
   "author": "DevOps <devops@processmaker.com>",
   "license": "ISC",
+  "engines": {
+    "node": ">=20"
+  },
   "homepage": "https://github.com/ProcessMaker/package-skeleton",
   "scripts": {
     "dev": "vite",

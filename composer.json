@@ -31,13 +31,16 @@
             "@php vendor/bin/phpcs --report-emacs"
         ],
         "post-install-cmd": [
-            "git config core.hooksPath ./.git-hooks"
+            "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath ./.git-hooks || true"
         ],
         "post-create-project-cmd": [
             "@php rename-project.php"
         ]
     },
     "require": {
+        "php": ">=8.4",
+        "ext-curl": "*",
+        "ext-json": "*",
         "swaggest/json-schema": "^0.12"
     },
     "require-dev": {
