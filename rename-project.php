@@ -174,30 +174,43 @@ function dashesToCamelCase($string, $capitalizeFirstCharacter = false, $replace 
 }
 
 /**
+ * MCP servers exposed by ProcessMaker core (routes/ai.php).
+ *
+ * @return array<string, string> Server name => endpoint path
+ */
+function processmakerMcpServers(): array
+{
+    return [
+        'processmaker-processes' => '/mcp/processes',
+        'processmaker-screens' => '/mcp/screens',
+        'processmaker-data-connectors' => '/mcp/data-connectors',
+        'processmaker-flow-genies' => '/mcp/flow-genies',
+    ];
+}
+
+/**
+ * @param string $key Top-level key: `mcpServers` (Claude Code, Cursor) or `servers` (VS Code)
  * @return array<string, mixed>
  */
-function buildMcpServersConfig(string $server): array
+function buildMcpServersConfig(string $server, string $key = 'mcpServers'): array
 {
-  $base = rtrim($server, '/');
+    $base = rtrim($server, '/');
+    $servers = [];
+    foreach (processmakerMcpServers() as $name => $path) {
+        $servers[$name] = ['type' => 'http', 'url' => $base . $path];
+    }
 
-  return [
-    'mcpServers' => [
-      'processmaker-processes' => [
-        'type' => 'http',
-        'url' => $base . '/mcp/processes',
-      ],
-      'processmaker-screens' => [
-        'type' => 'http',
-        'url' => $base . '/mcp/screens',
-      ],
-    ],
-  ];
+    return [$key => $servers];
 }
 
 function writeJsonConfig(string $path, array $data): void
 {
     $encoded = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     if ($encoded === false) {
+        return;
+    }
+    $directory = dirname($path);
+    if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
         return;
     }
     file_put_contents($path, $encoded . "\n");
@@ -208,6 +221,26 @@ function writeMcpConfig(string $projectRoot, string $server): void
     $mcp = buildMcpServersConfig($server);
     writeJsonConfig($projectRoot . '/.mcp.json', $mcp);
     writeJsonConfig($projectRoot . '/.cursor/mcp.json', $mcp);
+    writeJsonConfig($projectRoot . '/.vscode/mcp.json', buildMcpServersConfig($server, 'servers'));
+}
+
+/**
+ * Codex keeps MCP servers in the user config, so print the commands instead of writing a file.
+ *
+ * @return list<string>
+ */
+function codexMcpCommands(string $server): array
+{
+    $base = rtrim($server, '/');
+    $commands = [];
+    foreach (processmakerMcpServers() as $name => $path) {
+        $commands[] = 'codex mcp add ' . $name . ' --url ' . $base . $path;
+    }
+    foreach (array_keys(processmakerMcpServers()) as $name) {
+        $commands[] = 'codex mcp login ' . $name;
+    }
+
+    return $commands;
 }
 
 function writeEnvExample(string $projectRoot, string $server): void
@@ -444,6 +477,78 @@ function assertPackageUpsertSkills(string $projectRoot, callable $ok, callable $
     $warn('Missing package upsert skills: ' . implode(', ', $missing));
 }
 
+/**
+ * Same rule as ProcessMaker core PluginManager::extractRepoName(): core installs the plugin
+ * under storage/plugins/{repoName} and runs `{repoName}:install`.
+ */
+function extractRepoName(string $repoUrl): ?string
+{
+    $repoUrl = preg_replace('/(\.git|\/)$/', '', trim($repoUrl));
+    if (preg_match('#/([^/]+)$#', (string) $repoUrl, $matches)) {
+        return $matches[1];
+    }
+
+    return null;
+}
+
+/**
+ * @param callable(string): void $ok
+ * @param callable(string): void $warn
+ */
+function setupGitRepository(string $projectRoot, string $repoUrl, string $branch, callable $ok, callable $warn): void
+{
+    $root = escapeshellarg(rtrim($projectRoot, '/\\'));
+    $run = static function (string $command) use ($root): bool {
+        exec('git -C ' . $root . ' ' . $command . ' 2>&1', $output, $exitCode);
+
+        return $exitCode === 0;
+    };
+
+    if (!is_dir(rtrim($projectRoot, '/\\') . '/.git')) {
+        if (!$run('init')) {
+            $warn('git init failed; initialize the repository manually.');
+            return;
+        }
+        $ok('Initialized git repository');
+    }
+
+    // Works on every git version (git init -b needs 2.28+).
+    $run('symbolic-ref HEAD ' . escapeshellarg('refs/heads/' . $branch));
+    $run('config core.hooksPath ./.git-hooks');
+
+    exec('git -C ' . $root . ' remote get-url origin 2>/dev/null', $existingOrigin, $hasOrigin);
+    if ($hasOrigin === 0) {
+        $run('remote set-url origin ' . escapeshellarg($repoUrl));
+    } else {
+        $run('remote add origin ' . escapeshellarg($repoUrl));
+    }
+    $ok('git remote origin → ' . $repoUrl . ' (branch ' . $branch . ')');
+}
+
+$pluginRepo = trim((string) getenv('PM_PLUGIN_REPO'));
+$pluginBranch = trim((string) getenv('PM_PLUGIN_BRANCH'));
+if ($pluginBranch === '') {
+    $pluginBranch = 'main';
+}
+
+if ($pluginRepo !== '') {
+    $repoName = extractRepoName($pluginRepo);
+    if ($repoName === null) {
+        $warn("Could not extract a repository name from PM_PLUGIN_REPO ({$pluginRepo}).");
+        exit(1);
+    }
+    if ($repoName !== $projectName) {
+        // Core installs the plugin as storage/plugins/{repoName} and runs {repoName}:install.
+        $warn("Repository name '{$repoName}' must match the package name '{$projectName}'.");
+        $warn("Run: composer create-project … {$repoName}   (or set PM_PLUGIN_REPO to the matching repository).");
+        echo "\n";
+        exit(1);
+    }
+    if (!str_starts_with($pluginRepo, 'https://')) {
+        $warn('PM_PLUGIN_REPO is not an https:// URL; ProcessMaker (Admin › Plugins) only installs plugins from https:// URLs.');
+    }
+}
+
 $hr('renaming');
 $info('Replacing ' . $bold('package-skeleton') . ' → ' . $bold($projectName));
 searchDirectoryFiles(getcwd() . '/', 'package-skeleton', $projectName, $replacedCount, $dim);
@@ -486,7 +591,7 @@ $pm4Skills = [
     'pm4-slack',
     'pm4-sub-process',
     'pm4-uipath',
-    'pm4-webentry',
+    'pm4-web-entry',
     'vue2-pm4-patterns',
 ];
 $pm3Skills = [
@@ -548,7 +653,11 @@ if (!in_array($skillsProfile, ['migration', 'pm4'], true)) {
 // ProcessMaker target + MCP (shared by migration and PM4-only).
 $processmakerPlaceholder = '__PROCESSMAKER_' . 'SERVER__';
 $projectRoot = getcwd() . '/';
-$processmakerServer = trim((string) getenv('NAYRA_SERVER'));
+// PM_BASE_URL is the canonical name; NAYRA_SERVER is kept as an alias for older instructions.
+$processmakerServer = trim((string) getenv('PM_BASE_URL'));
+if ($processmakerServer === '') {
+    $processmakerServer = trim((string) getenv('NAYRA_SERVER'));
+}
 $syncToken = trim((string) getenv('PM_SYNC_TOKEN'));
 
 $hr('processmaker');
@@ -565,7 +674,7 @@ if ($processmakerServer !== '') {
     $server = rtrim($processmakerServer, '/');
     $info('Setting server → ' . $bold($server));
     writeMcpConfig($projectRoot, $server);
-    $ok('Wrote .mcp.json and .cursor/mcp.json (processes + screens)');
+    $ok('Wrote .mcp.json, .cursor/mcp.json and .vscode/mcp.json (4 MCP servers)');
     writeEnvExample($projectRoot, $server);
     $ok('Wrote .env.example');
     if ($syncToken !== '') {
@@ -629,14 +738,36 @@ if ($skillsProfile === '') {
 
 $hr('package-skills');
 assertPackageUpsertSkills($projectRoot, $ok, $warn);
-
 echo "\n";
+
+if ($pluginRepo !== '') {
+    $hr('git');
+    setupGitRepository($projectRoot, $pluginRepo, $pluginBranch, $ok, $warn);
+    echo "\n";
+}
+
 $hr();
-echo '  ' . $green('✦') . ' ' . $paint('1;97', 'Done') . $dim(" — {$projectName} is ready.") . "\n";
+echo '  ' . $green('✦') . ' ' . $paint('1;97', 'Done') . $dim(" — {$projectName} is ready.") . "\n\n";
+
+$info($bold('Next steps'));
+$step = 1;
+echo '    ' . $step++ . '. npm install && npm run prod' . $dim('   (builds public/, which core does not build)') . "\n";
+if ($pluginRepo !== '') {
+    echo '    ' . $step++ . '. Commit everything including ' . $bold('public/') . ' and push: git push -u origin ' . $pluginBranch . "\n";
+    echo '    ' . $step++ . '. Admin › Plugins › Install with ' . $bold($pluginRepo) . ' (branch ' . $pluginBranch . ')' . "\n";
+} else {
+    echo '    ' . $step++ . '. Create an empty git repository named ' . $bold($projectName) . ', commit everything including ' . $bold('public/') . ' and push it' . "\n";
+    echo '    ' . $step++ . '. Admin › Plugins › Install with the repository URL' . "\n";
+}
 if ($processmakerServer !== '') {
-    $info('MCP: connect processmaker-processes and processmaker-screens in Cursor with your API token.');
+    echo '    ' . $step++ . '. MCP (OAuth): authorize the 4 ProcessMaker servers in Claude Code, Cursor (.cursor/mcp.json) or VS Code (.vscode/mcp.json)' . "\n";
+    echo '       Codex:' . "\n";
+    foreach (codexMcpCommands($processmakerServer) as $codexCommand) {
+        echo '         ' . $dim($codexCommand) . "\n";
+    }
+    echo '    ' . $step++ . '. Put your ProcessMaker API token in .env as PM_SYNC_TOKEN (used by the upsert-* deploy scripts)' . "\n";
 }
 if ($skillsProfile === 'migration') {
-    $info('Next: ai-docs/migration/AGENTS.md');
+    echo '    ' . $step++ . '. ai-docs/migration/AGENTS.md' . "\n";
 }
 echo "\n";

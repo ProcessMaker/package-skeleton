@@ -7,6 +7,14 @@
     "processmaker-screens": {
       "type": "http",
       "url": "__PROCESSMAKER_SERVER__/mcp/screens"
+    },
+    "processmaker-data-connectors": {
+      "type": "http",
+      "url": "__PROCESSMAKER_SERVER__/mcp/data-connectors"
+    },
+    "processmaker-flow-genies": {
+      "type": "http",
+      "url": "__PROCESSMAKER_SERVER__/mcp/flow-genies"
     }
   }
 }
