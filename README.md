@@ -24,6 +24,13 @@ PM_SKILLS_PROFILE=migration NAYRA_SERVER=https://pm.example.com PM_SYNC_TOKEN=â€
   composer create-project --stability=dev processmaker/package-skeleton:dev-feature/FOUR-34328 my-package
 ```
 
+Optional ProcessMaker skills git branch for `npx skills add` (`processmaker/skills#<branch>`):
+
+```bash
+PM_SKILLS_BRANCH=FOUR-34493 PM_SKILLS_PROFILE=migration NAYRA_SERVER=https://pm.example.com PM_SYNC_TOKEN=â€¦ \
+  composer create-project --stability=dev processmaker/package-skeleton:dev-FOUR-34493 pm-mi01
+```
+
 ## Development
 Prefer `composer create-project` above. To rename a local clone:
 
