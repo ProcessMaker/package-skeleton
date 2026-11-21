@@ -13,6 +13,8 @@ Title = YAML basename. Auth via package root `.env` (`PM_BASE_URL`, `PM_SYNC_TOK
 
 `POST /api/1.0/deploy-screen` — body: `name`, `yml_content`, and on **update** required `version_name` (maps to `package-versions` **Version History** `subject`, same as the UI “Version Name” on publish)
 
+Top-level metadata (deployed on create/update): `description` (string, required for Designer), `category` or `screen_category_name` (defaults to **Uncategorized** on the host when omitted).
+
 The YAML must include `preview_presets`. Each item is `title` and `data`, and `data` is a quoted JSON string so `{}` stays a string:
 
 ```yaml
