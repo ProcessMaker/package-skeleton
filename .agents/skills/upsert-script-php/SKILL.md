@@ -13,7 +13,9 @@ Auth: Bearer `PM_SYNC_TOKEN`, base `PM_BASE_URL` in package root `.env` (set by 
 
 `POST /api/1.0/deploy-script` — on **update**, required `version_name` → Version History `subject` (package-versions)
 
-Body: `name` (title), `code` (full PHP).
+Body: `name` (title), `code` (full PHP), optional `description` and `script_category_name`.
+
+Sidecars (same basename as the script): `{name}.description.txt`, `{name}.category.txt` (default category **Uncategorized** when the category file is absent).
 
 BC alias: `POST /api/1.0/package-skeleton/deploy-script`.
 

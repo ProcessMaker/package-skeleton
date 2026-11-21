@@ -11,7 +11,7 @@ Process `name` = BPMN filename without extension. Git BPMN keeps `${screen:…}`
 
 `POST /api/1.0/deploy-process` — on **update**, required `version_name` → Version History `subject` (package-versions)
 
-For `projects/{slug}/bpmn/*.xml`, the CLI loads `projects/{slug}/process-description.txt` when present (override with `--description`).
+For `projects/{slug}/bpmn/*.xml`, the CLI loads `projects/{slug}/process-description.txt` when present (override with `--description`) and `process-category.txt` / `--category` for `process_category_name` (default **Uncategorized**).
 
 BC alias: `POST /api/1.0/package-skeleton/deploy-process`.
 

@@ -585,7 +585,17 @@ if ($skillsProfile === '') {
         ? $pm4Skills
         : array_merge($pm3Skills, $pm4Skills, $migrationSkills);
 
-    $command = 'npx skills add processmaker/skills -y';
+    $skillsSource = 'processmaker/skills';
+    $skillsBranch = trim((string) getenv('PM_SKILLS_BRANCH'));
+    if ($skillsBranch !== '') {
+        if (preg_match('/[#\s]/', $skillsBranch) === 1) {
+            $warn('PM_SKILLS_BRANCH must not contain # or spaces; using default skills source.');
+        } else {
+            $skillsSource .= '#' . $skillsBranch;
+        }
+    }
+
+    $command = 'npx skills add ' . escapeshellarg($skillsSource) . ' -y';
     foreach ($selectedSkills as $skill) {
         $command .= ' --skill ' . escapeshellarg($skill);
     }
@@ -595,7 +605,7 @@ if ($skillsProfile === '') {
     if ($upsertSkillsBackup === null) {
         $warn('Could not backup package upsert skills before install; continuing.');
     }
-    $info('Installing ProcessMaker skills (' . $bold($skillsProfile) . ', ' . count($selectedSkills) . ' skills)...');
+    $info('Installing ProcessMaker skills (' . $bold($skillsProfile) . ', ' . count($selectedSkills) . ' skills from ' . $bold($skillsSource) . ')...');
     echo $dim('    ' . $command) . "\n\n";
     passthru($command, $skillsExitCode);
     restorePackageUpsertSkills($projectRoot, $upsertSkillsBackup, $ok, $warn);
