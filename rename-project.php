@@ -787,7 +787,7 @@ if ($processmakerServer !== '') {
     foreach (codexMcpCommands($processmakerServer) as $codexCommand) {
         echo '         ' . $dim($codexCommand) . "\n";
     }
-    echo '    ' . $step++ . '. Put your ProcessMaker API token in .env as PM_SYNC_TOKEN (used by the upsert-* deploy scripts)' . "\n";
+    echo '    ' . $step++ . '. Optional, to deploy with the upsert-* scripts: create an API token (profile > API Tokens) and set PM_SYNC_TOKEN in .env' . "\n";
 }
 if ($skillsProfile === 'migration') {
     echo '    ' . $step++ . '. ai-docs/migration/AGENTS.md' . "\n";
