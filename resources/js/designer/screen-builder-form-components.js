@@ -1,7 +1,7 @@
 /* global Vue */
 import VueComponentRenderTemplate from '../components/screen-builder/freeEditor/RenderTemplate';
 import VueComponentEditor from '../components/screen-builder/freeEditor/VueComponentEditor.vue';
-import { VueComponentEditorConfig } from './componentsConfig';
+import VueComponentEditorConfig from './componentsConfig';
 import mergeVueComponentInspectorPanels from './vueComponentInspectorPanels';
 import { ensureScreenComponentRegistry } from '../componentsDesigner/customComponents';
 
