@@ -207,6 +207,23 @@ function buildMcpServersConfig(string $server, string $key = 'mcpServers'): arra
     return [$key => $servers];
 }
 
+/**
+ * OpenCode reads `opencode.json` from the project root: remote servers use `type: remote`
+ * and OpenCode starts the OAuth flow by itself when the server answers 401.
+ *
+ * @return array<string, mixed>
+ */
+function buildOpenCodeMcpConfig(string $server): array
+{
+    $base = rtrim($server, '/');
+    $servers = [];
+    foreach (processmakerMcpServers() as $name => $path) {
+        $servers[$name] = ['type' => 'remote', 'url' => $base . $path, 'enabled' => true];
+    }
+
+    return ['$schema' => 'https://opencode.ai/config.json', 'mcp' => $servers];
+}
+
 function writeJsonConfig(string $path, array $data): void
 {
     $encoded = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
@@ -226,6 +243,7 @@ function writeMcpConfig(string $projectRoot, string $server): void
     writeJsonConfig($projectRoot . '/.mcp.json', $mcp);
     writeJsonConfig($projectRoot . '/.cursor/mcp.json', $mcp);
     writeJsonConfig($projectRoot . '/.vscode/mcp.json', buildMcpServersConfig($server, 'servers'));
+    writeJsonConfig($projectRoot . '/opencode.json', buildOpenCodeMcpConfig($server));
 }
 
 /**
@@ -678,7 +696,7 @@ if ($processmakerServer !== '') {
     $server = rtrim($processmakerServer, '/');
     $info('Setting server → ' . $bold($server));
     writeMcpConfig($projectRoot, $server);
-    $ok('Wrote .mcp.json, .cursor/mcp.json and .vscode/mcp.json (4 MCP servers)');
+    $ok('Wrote .mcp.json, .cursor/mcp.json, .vscode/mcp.json and opencode.json (4 MCP servers)');
     writeEnvExample($projectRoot, $server);
     $ok('Wrote .env.example');
     if ($syncToken !== '') {
@@ -764,7 +782,7 @@ if ($pluginRepo !== '') {
     echo '    ' . $step++ . '. Admin › Plugins › Plugin: enter the repository URL and click Save to install' . "\n";
 }
 if ($processmakerServer !== '') {
-    echo '    ' . $step++ . '. MCP (OAuth): authorize the 4 ProcessMaker servers in Claude Code, Cursor (.cursor/mcp.json) or VS Code (.vscode/mcp.json)' . "\n";
+    echo '    ' . $step++ . '. MCP (OAuth): authorize the 4 ProcessMaker servers in Claude Code, Cursor (.cursor/mcp.json), VS Code (.vscode/mcp.json) or OpenCode (opencode.json)' . "\n";
     echo '       Codex:' . "\n";
     foreach (codexMcpCommands($processmakerServer) as $codexCommand) {
         echo '         ' . $dim($codexCommand) . "\n";

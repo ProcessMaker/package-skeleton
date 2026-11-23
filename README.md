@@ -22,7 +22,7 @@ Tests run inside ProcessMaker core, not standalone: see "PHPUnit development" in
 composer create-project --stability=dev processmaker/package-skeleton:dev-feature/FOUR-34328 my-package
 ```
 
-The post-install wizard checks the requirements (it stops if Node.js is missing), asks for **Migration** or **PM4 only**, then **ProcessMaker URL**, **API token** (optional), writes the MCP config for Claude Code (`.mcp.json`), Cursor (`.cursor/mcp.json`) and VS Code (`.vscode/mcp.json`) with the 4 ProcessMaker MCP servers (processes, screens, data-connectors, flow-genies), writes `.env.example`, and installs skills. Authorize the MCP servers with OAuth in your IDE. For Codex, the wizard prints the `codex mcp add` / `codex mcp login` commands to run.
+The post-install wizard checks the requirements (it stops if Node.js is missing), asks for **Migration** or **PM4 only**, then **ProcessMaker URL**, **API token** (optional), writes the MCP config for Claude Code (`.mcp.json`), Cursor (`.cursor/mcp.json`), VS Code (`.vscode/mcp.json`) and OpenCode (`opencode.json`) with the 4 ProcessMaker MCP servers (processes, screens, data-connectors, flow-genies), writes `.env.example`, and installs skills. Authorize the MCP servers with OAuth in your IDE. For Codex, the wizard prints the `codex mcp add` / `codex mcp login` commands to run.
 
 Asset publish (PM4 core deploy APIs; set `PM_BASE_URL` / `PM_SYNC_TOKEN`), in order:
 
