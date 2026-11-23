@@ -19,5 +19,10 @@
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/node_modules/*</exclude-pattern>
     <exclude-pattern>*/public/*</exclude-pattern>
+    <!-- Tooling that is not plugin code: the agent skills installed by the wizard and the setup scripts. -->
+    <exclude-pattern>*/.agents/*</exclude-pattern>
+    <exclude-pattern>*/.claude/*</exclude-pattern>
+    <exclude-pattern>*/setup/*</exclude-pattern>
+    <exclude-pattern>*/rename-project.php</exclude-pattern>
     <exclude-pattern>*.blade.php</exclude-pattern>
 </ruleset>
