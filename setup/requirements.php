@@ -10,10 +10,16 @@
  * Usage:
  *   php setup/requirements.php           # print table, exit 1 when something is missing
  *   php setup/requirements.php --json    # machine-readable output for agents
+ *
+ * Node.js: 22 is the minimum because 20 is end-of-life and no longer receives security fixes.
+ * The check also warns (never fails) when a newer patch of the installed Node.js line exists,
+ * because security fixes ship as patch releases. Set PM_SKIP_NODE_PATCH_CHECK=1 to skip that
+ * network lookup; it is also skipped silently when nodejs.org cannot be reached.
  */
 
 const REQUIRED_PHP = '8.4.0';
-const REQUIRED_NODE_MAJOR = 20;
+const REQUIRED_NODE_MAJOR = 22;
+const NODE_LATEST_PATCH_URL = 'https://nodejs.org/dist/latest-v%d.x/SHASUMS256.txt';
 const REQUIRED_COMPOSER_MAJOR = 2;
 const REQUIRED_EXTENSIONS = ['curl', 'json', 'mbstring', 'tokenizer', 'xmlwriter', 'simplexml'];
 
@@ -153,17 +159,89 @@ function failedRequirements(array $rows): array
     ));
 }
 
+/**
+ * Newest release of a Node.js major line, or null when it cannot be determined
+ * (offline, timeout, unknown major, opted out, or no curl).
+ */
+function fetchLatestNodePatch(int $major): ?string
+{
+    $skip = strtolower((string) getenv('PM_SKIP_NODE_PATCH_CHECK'));
+    if (in_array($skip, ['1', 'true', 'yes'], true) || !function_exists('curl_init')) {
+        return null;
+    }
+
+    $curl = curl_init(sprintf(NODE_LATEST_PATCH_URL, $major));
+    curl_setopt_array($curl, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_FAILONERROR => true,
+        CURLOPT_CONNECTTIMEOUT => 2,
+        CURLOPT_TIMEOUT => 3,
+    ]);
+    $body = curl_exec($curl);
+
+    if (!is_string($body) || !preg_match('/node-v(\d+\.\d+\.\d+)-/', $body, $matches)) {
+        return null;
+    }
+
+    return (int) explode('.', $matches[1])[0] === $major ? $matches[1] : null;
+}
+
+/**
+ * Warning text when a newer patch of the installed Node.js line exists, else null.
+ */
+function nodePatchAdvisory(string $installed, ?string $latest): ?string
+{
+    if ($latest === null || version_compare($installed, $latest, '>=')) {
+        return null;
+    }
+
+    return sprintf(
+        'Node.js v%s: a newer patch (%s) of the %d.x line is available. Security fixes ship as patch releases, please update Node.js.',
+        $installed,
+        $latest,
+        (int) explode('.', $installed)[0]
+    );
+}
+
+/**
+ * Non-failing notes about the checked tools (they never change the exit code).
+ *
+ * @param list<array{tool: string, required: string, found: string, ok: bool}> $rows
+ * @return list<string>
+ */
+function requirementAdvisories(array $rows): array
+{
+    foreach ($rows as $row) {
+        if ($row['tool'] !== 'node' || !$row['ok']) {
+            continue;
+        }
+        $advisory = nodePatchAdvisory($row['found'], fetchLatestNodePatch((int) explode('.', $row['found'])[0]));
+
+        return $advisory === null ? [] : [$advisory];
+    }
+
+    return [];
+}
+
 if (PHP_SAPI === 'cli' && realpath($_SERVER['SCRIPT_FILENAME'] ?? '') === __FILE__) {
     $rows = checkRequirements();
 
     if (in_array('--json', $argv ?? [], true)) {
-        echo json_encode(['ok' => requirementsPassed($rows), 'requirements' => $rows], JSON_PRETTY_PRINT) . "\n";
+        echo json_encode(
+            ['ok' => requirementsPassed($rows), 'requirements' => $rows, 'advisories' => requirementAdvisories($rows)],
+            JSON_PRETTY_PRINT
+        ) . "\n";
         exit(requirementsPassed($rows) ? 0 : 1);
     }
 
     echo "\n";
     printRequirementsTable($rows);
     echo "\n";
+
+    foreach (requirementAdvisories($rows) as $advisory) {
+        echo '  ! ' . $advisory . "\n\n";
+    }
 
     if (!requirementsPassed($rows)) {
         fwrite(STDERR, '  Missing or outdated: ' . implode(', ', failedRequirements($rows)) . "\n");

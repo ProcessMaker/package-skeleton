@@ -234,7 +234,7 @@ Before publishing or handing off a new screen:
 
 ## Storybook organization
 
-Run Storybook with Node 20+:
+Run Storybook with Node 22+ (24 recommended; see `.nvmrc`):
 `npm install`
 `npm run storybook`
 

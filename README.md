@@ -7,8 +7,10 @@ This package provides the necessary base code to start the developing a package 
 | --- | --- | --- |
 | PHP | >= 8.4 with `curl`, `json`, `mbstring`, `tokenizer`, `xmlwriter`, `simplexml` | the setup wizard, `upsert-*` deploy scripts, code style tools |
 | Composer | 2.x | `create-project`, `composer cs` |
-| Node.js + npm | >= 20 | `npx skills add` (during setup), Vite, Storybook |
+| Node.js + npm | >= 22 (24 recommended, see `.nvmrc`) | `npx skills add` (during setup), Vite, Storybook |
 | Git | any recent | pushing the plugin; ProcessMaker installs plugins from a git URL |
+
+Node.js 20 is end-of-life and no longer receives security fixes, so it is rejected. Keep Node.js on the latest patch of its line: security fixes ship as patch releases. The check below prints a warning (it never fails) when a newer patch of your Node.js line exists; set `PM_SKIP_NODE_PATCH_CHECK=1` to skip that lookup (it is also skipped silently when nodejs.org is unreachable).
 
 Check them with `composer doctor` (or `composer run-script doctor` / `php setup/requirements.php`; the last also supports `--json`). It exits with a non-zero code when something is missing.
 

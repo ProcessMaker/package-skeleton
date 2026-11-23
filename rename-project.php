@@ -96,6 +96,10 @@ $requirements = checkRequirements();
 $hr('requirements');
 printRequirementsTable($requirements);
 echo "\n";
+foreach (requirementAdvisories($requirements) as $advisory) {
+    $warn($advisory);
+    echo "\n";
+}
 
 // Node and npx are needed during this wizard (`npx skills add`) and for Vite/Storybook,
 // so stop before renaming anything instead of ending up with a project without skills.
