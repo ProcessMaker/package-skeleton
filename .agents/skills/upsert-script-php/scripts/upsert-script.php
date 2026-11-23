@@ -59,10 +59,19 @@ if ($code === false) {
 }
 
 $url = rtrim($host, '/') . ENDPOINT_PATH;
+$description = resolveSidecarText($phpPath, 'description');
+$categoryName = resolveSidecarText($phpPath, 'category');
+
 $body = [
     'name' => $name,
     'code' => $code,
 ];
+if ($description !== null) {
+    $body['description'] = $description;
+}
+if ($categoryName !== null) {
+    $body['script_category_name'] = $categoryName !== '' ? $categoryName : 'Uncategorized';
+}
 if ($versionName !== null && $versionName !== '') {
     $body['version_name'] = $versionName;
 }
@@ -169,6 +178,17 @@ function firstNonEmpty(?string ...$values): string
     }
 
     return '';
+}
+
+function resolveSidecarText(string $phpPath, string $suffix): ?string
+{
+    $sidecar = preg_replace('/\.php$/i', '.' . $suffix . '.txt', $phpPath);
+    if (!is_string($sidecar) || !is_file($sidecar)) {
+        return $suffix === 'category' ? 'Uncategorized' : null;
+    }
+    $text = trim((string) file_get_contents($sidecar));
+
+    return $text === '' ? null : $text;
 }
 
 function loadDotEnv(string $path): array

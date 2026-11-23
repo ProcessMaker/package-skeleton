@@ -66,6 +66,10 @@ function upsertProcess(string $file, string $host, string $token, array $options
     if ($description !== null) {
         $payload['description'] = $description;
     }
+    $categoryName = resolveProcessCategoryName($path, $options['category'] ?? null);
+    if ($categoryName !== null) {
+        $payload['process_category_name'] = $categoryName;
+    }
     $versionName = $options['version-name'] ?? null;
     if (is_string($versionName) && $versionName !== '') {
         $payload['version_name'] = $versionName;
@@ -185,6 +189,7 @@ function parseArguments(array $arguments): array
         'token' => null,
         'output' => null,
         'description' => null,
+        'category' => null,
         'version-name' => null,
     ];
 
@@ -221,6 +226,31 @@ function resolvePath(string $path): string
 /**
  * CLI --description, else projects/{slug}/process-description.txt when BPMN is under projects/{slug}/bpmn/.
  */
+function resolveProcessCategoryName(string $bpmnPath, ?string $cliCategory): ?string
+{
+    if ($cliCategory !== null && trim($cliCategory) !== '') {
+        return trim($cliCategory);
+    }
+
+    $canonical = realpath($bpmnPath) ?: $bpmnPath;
+    $projectsDir = DIRECTORY_SEPARATOR . 'projects' . DIRECTORY_SEPARATOR;
+    $parts = preg_match('#^(.*)' . preg_quote($projectsDir, '#') . '([^/]+)/bpmn/[^/]+$#', $canonical, $matches)
+        ? [$matches[1], $matches[2]]
+        : false;
+    if ($parts === false) {
+        return 'Uncategorized';
+    }
+
+    $categoryFile = $parts[0] . $projectsDir . $parts[1] . DIRECTORY_SEPARATOR . 'process-category.txt';
+    if (!is_file($categoryFile)) {
+        return 'Uncategorized';
+    }
+
+    $text = trim((string) file_get_contents($categoryFile));
+
+    return $text === '' ? 'Uncategorized' : $text;
+}
+
 function resolveProcessDescription(string $bpmnPath, ?string $cliDescription): ?string
 {
     if ($cliDescription !== null && $cliDescription !== '') {
