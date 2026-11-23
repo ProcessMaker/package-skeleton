@@ -703,7 +703,7 @@ if ($processmakerServer !== '') {
         writeLocalEnv($projectRoot, $server, $syncToken);
         $ok('Wrote .env with PM_BASE_URL and PM_SYNC_TOKEN');
     } else {
-        $warn('No PM_SYNC_TOKEN; add it to .env before deploy or authorize MCP in the IDE.');
+        $warn('No PM_SYNC_TOKEN; it is required: add it to .env before using the upsert-* deploy scripts.');
     }
     $urlCount = 0;
     searchDirectoryFiles($projectRoot, $processmakerPlaceholder, $server, $urlCount, $dim);
@@ -797,7 +797,7 @@ if ($processmakerServer !== '') {
     foreach (codexMcpCommands($processmakerServer) as $codexCommand) {
         echo '         ' . $dim($codexCommand) . "\n";
     }
-    echo '    ' . $step++ . '. Optional, to deploy with the upsert-* scripts: create an API token (profile > API Tokens) and set PM_SYNC_TOKEN in .env' . "\n";
+    echo '    ' . $step++ . '. Required: create an API token at ' . rtrim($processmakerServer, '/') . '/admin/users (your user > API Tokens > New Token) and set PM_SYNC_TOKEN in .env' . "\n";
 }
 if ($skillsProfile === 'migration') {
     echo '    ' . $step++ . '. ai-docs/migration/AGENTS.md' . "\n";
