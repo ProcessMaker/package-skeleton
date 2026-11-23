@@ -16,10 +16,10 @@
       class="invalid-feedback"
     >
       <div
-        v-for="(error, index) in validator.errors.get(name)"
+        v-for="(validationError, index) in validator.errors.get(name)"
         :key="index"
       >
-        {{ error }}
+        {{ validationError }}
       </div>
       <div v-if="error">
         {{ error }}

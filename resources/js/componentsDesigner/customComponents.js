@@ -126,17 +126,18 @@ export function resolveCustomComponents(uses = [], visited = new Set()) {
         ...component.components,
         ...resolveCustomComponents(custom.components, nextVisited),
       };
-      components[name] = component;
-      return components;
+      return { ...components, [name]: component };
     }
 
     const official = officialComponents.find((item) => item.key === key);
     if (!official) return components;
     const children = resolveCustomComponents(official.components || [], nextVisited);
-    components[name] = Object.keys(children).length
-      ? { extends: official.component, components: children }
-      : official.component;
-    return components;
+    return {
+      ...components,
+      [name]: Object.keys(children).length
+        ? { extends: official.component, components: children }
+        : official.component,
+    };
   }, {});
 }
 

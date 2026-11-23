@@ -44,7 +44,7 @@ PM_PLUGIN_REPO=https://github.com/my-org/my-package.git PM_PLUGIN_BRANCH=main \
 | --- | --- |
 | `PM_SKILLS_PROFILE` | `pm4` (PM4 skills) or `migration` (PM3 + PM4 + migration skills). Without it no skills are installed. |
 | `PM_BASE_URL` | ProcessMaker URL used for the MCP config and `.env`. `NAYRA_SERVER` is still accepted as an alias. |
-| `PM_SYNC_TOKEN` | ProcessMaker API token for the `upsert-*` deploy scripts. Written to `.env` (git-ignored). It is not used for MCP, which uses OAuth. |
+| `PM_SYNC_TOKEN` | Required. ProcessMaker API token for the `upsert-*` deploy scripts (create it at `<PM_BASE_URL>/admin/users` > your user > API Tokens). Written to `.env` (git-ignored). It is not used for MCP, which uses OAuth. |
 | `PM_PLUGIN_REPO` | `https://` URL of the plugin's git repository. The repository name **must equal the package name** (the wizard stops otherwise): ProcessMaker installs the plugin as `storage/plugins/{repo-name}` and runs `{repo-name}:install`. The wizard then runs `git init`, sets the branch and adds `origin`. |
 | `PM_PLUGIN_BRANCH` | Branch to use with `PM_PLUGIN_REPO`. Defaults to `main`. |
 

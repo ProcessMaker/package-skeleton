@@ -1,4 +1,4 @@
-export const VueComponentEditorConfig = {
+const VueComponentEditorConfig = {
   editorComponent: 'VueComponentEditor',
   editorBinding: 'VueComponentEditor',
   rendererComponent: 'VueComponentRenderTemplate',
@@ -50,3 +50,5 @@ export const VueComponentEditorConfig = {
     ],
   },
 };
+
+export default VueComponentEditorConfig;
