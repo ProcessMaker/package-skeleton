@@ -74,6 +74,7 @@ function upsertProcess(string $file, string $host, string $token, array $options
     if (is_string($versionName) && $versionName !== '') {
         $payload['version_name'] = $versionName;
     }
+    $payload += resolveAlternativePayload($options);
 
     $response = request(
         'POST',
@@ -84,6 +85,27 @@ function upsertProcess(string $file, string $host, string $token, array $options
 
     echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
     exit(0);
+}
+
+/**
+ * @return array<string, mixed>
+ */
+function resolveAlternativePayload(array $options): array
+{
+    $alternative = strtoupper((string) ($options['alternative'] ?? ''));
+    $publish = (bool) $options['publish'];
+
+    if ($alternative !== '' && !in_array($alternative, ['A', 'B'], true)) {
+        fail('--alternative must be A or B.');
+    }
+    if ($publish && $alternative !== 'B') {
+        fail('--publish is only valid with --alternative B.');
+    }
+    if ($alternative !== 'B') {
+        return [];
+    }
+
+    return ['alternative' => 'B', 'publish' => $publish];
 }
 
 function getProcess(
@@ -178,7 +200,7 @@ function request(
 }
 
 /**
- * @return array{0: ?string, 1: ?string, 2: array{host: ?string, token: ?string, output: ?string, description: ?string, version-name: ?string}}
+ * @return array{0: ?string, 1: ?string, 2: array{host: ?string, token: ?string, output: ?string, description: ?string, version-name: ?string, alternative: ?string, publish: bool}}
  */
 function parseArguments(array $arguments): array
 {
@@ -191,10 +213,17 @@ function parseArguments(array $arguments): array
         'description' => null,
         'category' => null,
         'version-name' => null,
+        'alternative' => null,
     ];
+    $flags = ['publish' => false];
 
     for ($index = 0; $index < count($arguments); $index++) {
         $argument = $arguments[$index];
+
+        if ($argument === '--publish') {
+            $flags['publish'] = true;
+            continue;
+        }
 
         foreach (array_keys($options) as $option) {
             if ($argument === "--{$option}") {
@@ -215,7 +244,7 @@ function parseArguments(array $arguments): array
         fail("Unknown argument: {$argument}");
     }
 
-    return [$command, $target, $options];
+    return [$command, $target, $options + $flags];
 }
 
 function resolvePath(string $path): string
@@ -331,6 +360,7 @@ function usage(): never
     fwrite(STDERR, <<<TEXT
 Usage:
   php sync-process.php upsert path/to/process.bpmn [--host URL] [--token TOKEN] [--description TEXT] [--version-name TEXT]
+                                     [--alternative B [--publish]]
   php sync-process.php get process-name [--output path/to/process.bpmn] [--host URL] [--token TOKEN]
 
 TEXT);

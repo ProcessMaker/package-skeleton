@@ -19,6 +19,16 @@ BC alias: `POST /api/1.0/package-skeleton/deploy-process`.
 php .agents/skills/upsert-process-bpmn/scripts/sync-process.php upsert projects/{slug}/bpmn/{name}.xml
 ```
 
+## Alternative B
+
+Add `--alternative B` to write the BPMN to **Alternative B** of an existing process. The live process (Alternative A) is never changed. Without `--publish` it saves the B draft; with `--publish` it publishes a B version and links it to the A/B record (`process_version_b_id`). Requires package-ab-testing and a process that already exists (deploy it as A first). `version_name` is not needed for B.
+
+```bash
+php .agents/skills/upsert-process-bpmn/scripts/sync-process.php upsert projects/{slug}/bpmn/{name}.xml --alternative B --publish
+```
+
+Publishing B does **not** route cases to it: A/B routing stays as configured. Check the routing expression before switching (see the `pm4-process-refactor` skill, "Run a case on B").
+
 ## Pull
 
 ```bash
