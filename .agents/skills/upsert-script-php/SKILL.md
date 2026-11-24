@@ -13,7 +13,11 @@ Auth: Bearer `PM_SYNC_TOKEN`, base `PM_BASE_URL` in package root `.env` (set by 
 
 `POST /api/1.0/deploy-script` — on **update**, required `version_name` → Version History `subject` (package-versions)
 
-Body: `name` (title), `code` (full PHP), optional `description` and `script_category_name`.
+Body: `name` (title), `code` (full PHP), optional `description`, `script_category_name`, and `script_executor_id` or `script_executor_title` (a `php` executor; the id wins).
+
+### Executor
+
+Without an executor, a new script goes to the first `php` executor on the instance. A plugin that runs its own classes in a script (`use ProcessMaker\Package\...`) needs the **plugin executor** (the one built with this package), so pass it: `--executor 13` (id) or `--executor "my-executor"` (title), or set `PM_SCRIPT_EXECUTOR` in `.env`. The option also moves an existing script to that executor on update. An update without it keeps the current executor. A missing executor or one that is not `php` returns 422.
 
 Sidecars (same basename as the script): `{name}.description.txt`, `{name}.category.txt` (default category **Uncategorized** when the category file is absent).
 

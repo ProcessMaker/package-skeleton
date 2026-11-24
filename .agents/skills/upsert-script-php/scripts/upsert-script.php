@@ -6,7 +6,8 @@
  *
  * POST /api/1.0/deploy-script (ProcessMaker core)
  *
- * Reads PM_BASE_URL and PM_SYNC_TOKEN from the package root .env
+ * Reads PM_BASE_URL, PM_SYNC_TOKEN and the optional PM_SCRIPT_EXECUTOR
+ * (executor id or title) from the package root .env
  */
 
 const ENDPOINT_PATH = '/api/1.0/deploy-script';
@@ -14,10 +15,10 @@ const ENDPOINT_PATH = '/api/1.0/deploy-script';
 $projectRoot = dirname(__DIR__, 4);
 $envPath = $projectRoot . '/.env';
 
-[$phpFile, $hostOverride, $tokenOverride, $versionName] = parseCliArgs(array_slice($argv, 1));
+[$phpFile, $hostOverride, $tokenOverride, $versionName, $executorOverride] = parseCliArgs(array_slice($argv, 1));
 
 if ($phpFile === null) {
-    fwrite(STDERR, "Usage: php upsert-script.php path/to/script.php [--host URL] [--token TOKEN] [--version-name TEXT]\n");
+    fwrite(STDERR, "Usage: php upsert-script.php path/to/script.php [--host URL] [--token TOKEN] [--version-name TEXT] [--executor ID|TITLE]\n");
     exit(1);
 }
 
@@ -51,6 +52,11 @@ if ($token === '') {
     exit(1);
 }
 
+$executor = $executorOverride ?: firstNonEmpty(
+    $env['PM_SCRIPT_EXECUTOR'] ?? null,
+    getenv('PM_SCRIPT_EXECUTOR') ?: null
+);
+
 $name = pathinfo($phpPath, PATHINFO_FILENAME);
 $code = file_get_contents($phpPath);
 if ($code === false) {
@@ -74,6 +80,11 @@ if ($categoryName !== null) {
 }
 if ($versionName !== null && $versionName !== '') {
     $body['version_name'] = $versionName;
+}
+if ($executor !== '') {
+    // A number is an executor id, anything else is the executor title.
+    $body[ctype_digit($executor) ? 'script_executor_id' : 'script_executor_title'] =
+        ctype_digit($executor) ? (int) $executor : $executor;
 }
 $payload = json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
@@ -117,7 +128,7 @@ if (preg_match('/^use\s+ProcessMaker\\\\Package\\\\/m', $code) === 1) {
 exit(0);
 
 /**
- * @return array{0: ?string, 1: ?string, 2: ?string, 3: ?string}
+ * @return array{0: ?string, 1: ?string, 2: ?string, 3: ?string, 4: ?string}
  */
 function parseCliArgs(array $args): array
 {
@@ -125,6 +136,7 @@ function parseCliArgs(array $args): array
     $host = null;
     $token = null;
     $versionName = null;
+    $executor = null;
 
     for ($i = 0; $i < count($args); $i++) {
         $arg = $args[$i];
@@ -138,6 +150,14 @@ function parseCliArgs(array $args): array
         }
         if ($arg === '--version-name') {
             $versionName = $args[++$i] ?? '';
+            continue;
+        }
+        if ($arg === '--executor') {
+            $executor = $args[++$i] ?? '';
+            continue;
+        }
+        if (str_starts_with($arg, '--executor=')) {
+            $executor = substr($arg, 11);
             continue;
         }
         if (str_starts_with($arg, '--host=')) {
@@ -157,7 +177,7 @@ function parseCliArgs(array $args): array
         }
     }
 
-    return [$phpFile, $host, $token, $versionName];
+    return [$phpFile, $host, $token, $versionName, $executor];
 }
 
 function resolvePath(string $path, string $cwd): string
