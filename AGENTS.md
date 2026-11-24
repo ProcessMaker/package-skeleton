@@ -192,7 +192,7 @@ MCP (`/mcp/screens`, `/mcp/processes`) is optional for authoring; git → instan
 Before publishing or handing off a new screen:
 
 - Run ESLint on modified Vue/JavaScript source.
-- Run relevant Storybook interaction tests for loading, empty, error, success, and submit/cancel behavior.
+- Run relevant Storybook interaction tests for loading, empty, error, success, and submit/cancel behavior. The first `npm run test-storybook` can fail with `__test is not defined` while Vite optimizes dependencies: start `npm run storybook`, open it once, and run the tests again. If Playwright reports "Executable doesn't exist", run `npx playwright install chromium`.
 - After Storybook verification, list each relevant story as a markdown link `[ExportName](http://127.0.0.1:7007/?path=/story/<storyId>)`.
 - Review SonarQube findings introduced in `resources/js/projects/**`; fix new Blocker, Critical, and Major issues.
 - Guard `this.data` in `handlerVue`.
@@ -270,6 +270,23 @@ Docker dev stack (`pm4_core` container, working dir `/core`):
 ```
 docker exec -it --env-file <pm4-core>/compose/envs/app.env.testing pm4_core \
   ./vendor/bin/phpunit storage/plugins/{package-name}/tests/{test_path}
+```
+
+PHPUnit 12 ignores `@dataProvider` annotations (the test then fails with `ArgumentCountError`). Use the attribute and a static provider:
+
+```php
+use PHPUnit\Framework\Attributes\DataProvider;
+
+#[DataProvider('cases')]
+public function testSomething(string $input, string $expected): void
+{
+    // ...
+}
+
+public static function cases(): array
+{
+    return ['empty' => ['', '']];
+}
 ```
 
 Script tasks usually expect a global `$data` and return an array. Script wrapper tests live under `tests/Unit/Documentation` when present.

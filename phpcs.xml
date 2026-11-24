@@ -2,6 +2,8 @@
 <ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="codingame-solutions">
     <description>PHP_CodeSniffer configuration</description>
     <config name="php_version" value="70300"/>
+    <!-- Warnings (for example a long line) are reported but must not fail composer cs or the pre-commit hook. -->
+    <config name="ignore_warnings_on_exit" value="1"/>
     <arg name="cache" />
     <arg name="extensions" value="php"/>
     <arg name="encoding" value="utf-8"/>

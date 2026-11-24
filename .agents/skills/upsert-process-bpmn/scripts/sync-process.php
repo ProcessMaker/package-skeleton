@@ -174,11 +174,10 @@ function request(
         $options[CURLOPT_POSTFIELDS] = $encoded;
     }
 
-    curl_setopt_array($handle, $options);
+    curl_setopt_array($handle, tlsOptions() + $options);
     $body = curl_exec($handle);
     $status = (int) curl_getinfo($handle, CURLINFO_HTTP_CODE);
     $error = curl_error($handle);
-    curl_close($handle);
 
     if ($body === false) {
         fail("Request failed: {$error}");
@@ -193,6 +192,7 @@ function request(
     ) {
         fwrite(STDERR, "HTTP {$status} from {$url}" . PHP_EOL);
         fwrite(STDERR, $body . PHP_EOL);
+        printVersionNameHint((string) $body);
         exit(1);
     }
 
@@ -223,6 +223,10 @@ function parseArguments(array $arguments): array
         if ($argument === '--publish') {
             $flags['publish'] = true;
             continue;
+        }
+
+        if ($argument === '--insecure') {
+            continue; // Read by tlsOptions().
         }
 
         foreach (array_keys($options) as $option) {
@@ -360,8 +364,11 @@ function usage(): never
     fwrite(STDERR, <<<TEXT
 Usage:
   php sync-process.php upsert path/to/process.bpmn [--host URL] [--token TOKEN] [--description TEXT] [--version-name TEXT]
-                                     [--alternative B [--publish]]
-  php sync-process.php get process-name [--output path/to/process.bpmn] [--host URL] [--token TOKEN]
+                                     [--alternative B [--publish]] [--insecure]
+  php sync-process.php get process-name [--output path/to/process.bpmn] [--host URL] [--token TOKEN] [--insecure]
+
+Local HTTPS with a self-signed certificate: --insecure (or PM_INSECURE=1), or PM_CA_BUNDLE=/path/ca.pem.
+Updating an existing process needs --version-name.
 
 TEXT);
     exit(1);
@@ -371,4 +378,37 @@ function fail(string $message): never
 {
     fwrite(STDERR, $message . PHP_EOL);
     exit(1);
+}
+
+/**
+ * TLS options for a local HTTPS instance with a self-signed or private CA.
+ *
+ * --insecure or PM_INSECURE=1 skips verification (local development only).
+ * PM_CA_BUNDLE or CURL_CA_BUNDLE points to a CA file and keeps verification on.
+ *
+ * @return array<int, mixed>
+ */
+function tlsOptions(): array
+{
+    $env = loadDotEnv(dirname(__DIR__, 4) . '/.env');
+    $flag = strtolower((string) ($env['PM_INSECURE'] ?? getenv('PM_INSECURE') ?: ''));
+    if (in_array('--insecure', $GLOBALS['argv'] ?? [], true) || in_array($flag, ['1', 'true', 'yes'], true)) {
+        fwrite(STDERR, "Warning: TLS verification is disabled (--insecure or PM_INSECURE).\n");
+
+        return [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => 0];
+    }
+
+    $bundle = (string) ($env['PM_CA_BUNDLE'] ?? getenv('PM_CA_BUNDLE') ?: getenv('CURL_CA_BUNDLE') ?: '');
+
+    return $bundle !== '' && is_file($bundle) ? [CURLOPT_CAINFO => $bundle] : [];
+}
+
+/**
+ * Updating an existing asset needs a version name; say so instead of only printing the raw 422.
+ */
+function printVersionNameHint(string $body): void
+{
+    if (stripos($body, 'version name') !== false) {
+        fwrite(STDERR, "Hint: this asset already exists, so an update needs --version-name \"short change summary\".\n");
+    }
 }

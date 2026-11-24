@@ -41,4 +41,15 @@ php .agents/skills/upsert-screen-yaml/scripts/upsert-screen.php projects/{slug}/
 php .agents/skills/upsert-screen-yaml/scripts/get-screen.php projects/{slug}/screens/{title}.yaml
 ```
 
+Every item in the pulled YAML carries `inspector: []` (the export drops the inspector metadata and adds the empty list back), so a pulled screen can be pushed again without editing.
+
+## Titles with `/`
+
+The YAML basename is the screen title, and a file name cannot contain `/`. For a converter title such as `PD.01 / DT.13 / Totals v1.0`, use `PD.01 - DT.13 - Totals v1.0` as the file name and push it. That creates a screen with the new title; the original keeps its old title, so point the task's `${screen:...}` ref to the new one. Do not use look-alike Unicode slashes.
+
+## Local HTTPS and updates
+
+- A local instance with a self-signed certificate fails with `SSL certificate problem`. Pass `--insecure` (or set `PM_INSECURE=1`) for local development only, or set `PM_CA_BUNDLE=/path/to/ca.pem` (or `CURL_CA_BUNDLE`) to keep verification on. Using `http://` for a local host also works.
+- Updating an asset that already exists needs `--version-name "short change summary"`. Without it the API returns 422 and the CLI prints a hint.
+
 Publish **after** scripts, **before** process BPMN.

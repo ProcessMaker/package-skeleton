@@ -35,4 +35,9 @@ Publishing B does **not** route cases to it: A/B routing stays as configured. Ch
 php .agents/skills/upsert-process-bpmn/scripts/sync-process.php get {name} --output projects/{slug}/bpmn/{name}.xml
 ```
 
+## Local HTTPS and updates
+
+- A local instance with a self-signed certificate fails with `SSL certificate problem`. Pass `--insecure` (or set `PM_INSECURE=1`) for local development only, or set `PM_CA_BUNDLE=/path/to/ca.pem` (or `CURL_CA_BUNDLE`) to keep verification on. Using `http://` for a local host also works.
+- Updating an asset that already exists needs `--version-name "short change summary"`. Without it the API returns 422 and the CLI prints a hint.
+
 Order: upsert-script-php → upsert-screen-yaml → this skill.
