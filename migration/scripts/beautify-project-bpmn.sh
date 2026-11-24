@@ -33,6 +33,13 @@ if [[ -z "$CLI" || ! -f "$CLI" ]]; then
 fi
 
 TMP="$(mktemp "${TMPDIR:-/tmp}/beautify-XXXXXX.bpmn")"
-node "$CLI" beautify "$BPMN" --output "$TMP" --theme professional
+EXTRA=()
+if [[ -n "${PM4_BPMN_ROUTING_GRID_LIMIT:-}" ]]; then
+  EXTRA+=(--routing-grid-limit "$PM4_BPMN_ROUTING_GRID_LIMIT")
+fi
+if [[ -n "${PM4_BPMN_LARGE_DIAGRAM:-}" ]]; then
+  EXTRA+=(--large-diagram "$PM4_BPMN_LARGE_DIAGRAM")
+fi
+node "$CLI" beautify "$BPMN" --output "$TMP" --theme professional --large-diagram coarsen-fallback "${EXTRA[@]}"
 mv "$TMP" "$BPMN"
 echo "Beautified $BPMN"
