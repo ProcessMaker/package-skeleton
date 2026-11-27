@@ -18,7 +18,7 @@ trait ValidatesWithJsonSchema
 
     protected ?\Swaggest\JsonSchema\RemoteRef\Preloaded $refProvider = null;
 
-  /** @var array<string, mixed> */
+    /** @var array<string, mixed> */
     protected array $attributes = [];
 
     /** @var array<string, mixed> */

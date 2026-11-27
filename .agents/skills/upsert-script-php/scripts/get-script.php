@@ -29,7 +29,7 @@ if ($positional !== null) {
 }
 
 if ($name === null || $name === '') {
-    fwrite(STDERR, "Usage: php get-script.php path/to/script.php [--host URL] [--token TOKEN]\n");
+    fwrite(STDERR, "Usage: php get-script.php path/to/script.php [--host URL] [--token TOKEN] [--insecure]\n");
     fwrite(STDERR, "       php get-script.php --name script-title [--out path/to/script.php]\n");
     exit(1);
 }
@@ -56,7 +56,7 @@ if ($token === '') {
 $url = rtrim($host, '/') . ENDPOINT_PATH . '?name=' . rawurlencode($name);
 
 $ch = curl_init($url);
-curl_setopt_array($ch, [
+curl_setopt_array($ch, tlsOptions() + [
     CURLOPT_HTTPGET => true,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT => 60,
@@ -69,7 +69,6 @@ curl_setopt_array($ch, [
 $body = curl_exec($ch);
 $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $error = curl_error($ch);
-curl_close($ch);
 
 if ($body === false) {
     fwrite(STDERR, "Request failed: {$error}\n");
@@ -208,4 +207,27 @@ function loadDotEnv(string $path): array
     }
 
     return $vars;
+}
+
+/**
+ * TLS options for a local HTTPS instance with a self-signed or private CA.
+ *
+ * --insecure or PM_INSECURE=1 skips verification (local development only).
+ * PM_CA_BUNDLE or CURL_CA_BUNDLE points to a CA file and keeps verification on.
+ *
+ * @return array<int, mixed>
+ */
+function tlsOptions(): array
+{
+    $env = loadDotEnv(dirname(__DIR__, 4) . '/.env');
+    $flag = strtolower((string) ($env['PM_INSECURE'] ?? getenv('PM_INSECURE') ?: ''));
+    if (in_array('--insecure', $GLOBALS['argv'] ?? [], true) || in_array($flag, ['1', 'true', 'yes'], true)) {
+        fwrite(STDERR, "Warning: TLS verification is disabled (--insecure or PM_INSECURE).\n");
+
+        return [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => 0];
+    }
+
+    $bundle = (string) ($env['PM_CA_BUNDLE'] ?? getenv('PM_CA_BUNDLE') ?: getenv('CURL_CA_BUNDLE') ?: '');
+
+    return $bundle !== '' && is_file($bundle) ? [CURLOPT_CAINFO => $bundle] : [];
 }

@@ -606,6 +606,7 @@ $pm4Skills = [
     'pm4-pm-block',
     'pm4-process',
     'pm4-process-health',
+    'pm4-process-refactor',
     'pm4-screen',
     'pm4-script',
     'pm4-send-email',

@@ -6,7 +6,8 @@
  *
  * POST /api/1.0/deploy-script (ProcessMaker core)
  *
- * Reads PM_BASE_URL and PM_SYNC_TOKEN from the package root .env
+ * Reads PM_BASE_URL, PM_SYNC_TOKEN and the optional PM_SCRIPT_EXECUTOR
+ * (executor id or title) from the package root .env
  */
 
 const ENDPOINT_PATH = '/api/1.0/deploy-script';
@@ -14,10 +15,10 @@ const ENDPOINT_PATH = '/api/1.0/deploy-script';
 $projectRoot = dirname(__DIR__, 4);
 $envPath = $projectRoot . '/.env';
 
-[$phpFile, $hostOverride, $tokenOverride, $versionName] = parseCliArgs(array_slice($argv, 1));
+[$phpFile, $hostOverride, $tokenOverride, $versionName, $executorOverride] = parseCliArgs(array_slice($argv, 1));
 
 if ($phpFile === null) {
-    fwrite(STDERR, "Usage: php upsert-script.php path/to/script.php [--host URL] [--token TOKEN] [--version-name TEXT]\n");
+    fwrite(STDERR, "Usage: php upsert-script.php path/to/script.php [--host URL] [--token TOKEN] [--version-name TEXT] [--executor ID|TITLE] [--insecure]\n");
     exit(1);
 }
 
@@ -51,6 +52,11 @@ if ($token === '') {
     exit(1);
 }
 
+$executor = $executorOverride ?: firstNonEmpty(
+    $env['PM_SCRIPT_EXECUTOR'] ?? null,
+    getenv('PM_SCRIPT_EXECUTOR') ?: null
+);
+
 $name = pathinfo($phpPath, PATHINFO_FILENAME);
 $code = file_get_contents($phpPath);
 if ($code === false) {
@@ -75,10 +81,15 @@ if ($categoryName !== null) {
 if ($versionName !== null && $versionName !== '') {
     $body['version_name'] = $versionName;
 }
+if ($executor !== '') {
+    // A number is an executor id, anything else is the executor title.
+    $body[ctype_digit($executor) ? 'script_executor_id' : 'script_executor_title'] =
+        ctype_digit($executor) ? (int) $executor : $executor;
+}
 $payload = json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
 $ch = curl_init($url);
-curl_setopt_array($ch, [
+curl_setopt_array($ch, tlsOptions() + [
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => $payload,
     CURLOPT_RETURNTRANSFER => true,
@@ -93,7 +104,6 @@ curl_setopt_array($ch, [
 $body = curl_exec($ch);
 $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $error = curl_error($ch);
-curl_close($ch);
 
 if ($body === false) {
     fwrite(STDERR, "Request failed: {$error}\n");
@@ -104,6 +114,7 @@ $data = json_decode($body, true);
 if (!is_array($data) || empty($data['success'])) {
     fwrite(STDERR, "HTTP {$status} from {$url}\n");
     fwrite(STDERR, $body . "\n");
+    printVersionNameHint((string) $body);
     exit(1);
 }
 
@@ -117,7 +128,7 @@ if (preg_match('/^use\s+ProcessMaker\\\\Package\\\\/m', $code) === 1) {
 exit(0);
 
 /**
- * @return array{0: ?string, 1: ?string, 2: ?string, 3: ?string}
+ * @return array{0: ?string, 1: ?string, 2: ?string, 3: ?string, 4: ?string}
  */
 function parseCliArgs(array $args): array
 {
@@ -125,6 +136,7 @@ function parseCliArgs(array $args): array
     $host = null;
     $token = null;
     $versionName = null;
+    $executor = null;
 
     for ($i = 0; $i < count($args); $i++) {
         $arg = $args[$i];
@@ -138,6 +150,14 @@ function parseCliArgs(array $args): array
         }
         if ($arg === '--version-name') {
             $versionName = $args[++$i] ?? '';
+            continue;
+        }
+        if ($arg === '--executor') {
+            $executor = $args[++$i] ?? '';
+            continue;
+        }
+        if (str_starts_with($arg, '--executor=')) {
+            $executor = substr($arg, 11);
             continue;
         }
         if (str_starts_with($arg, '--host=')) {
@@ -157,7 +177,7 @@ function parseCliArgs(array $args): array
         }
     }
 
-    return [$phpFile, $host, $token, $versionName];
+    return [$phpFile, $host, $token, $versionName, $executor];
 }
 
 function resolvePath(string $path, string $cwd): string
@@ -224,4 +244,37 @@ function loadDotEnv(string $path): array
     }
 
     return $vars;
+}
+
+/**
+ * TLS options for a local HTTPS instance with a self-signed or private CA.
+ *
+ * --insecure or PM_INSECURE=1 skips verification (local development only).
+ * PM_CA_BUNDLE or CURL_CA_BUNDLE points to a CA file and keeps verification on.
+ *
+ * @return array<int, mixed>
+ */
+function tlsOptions(): array
+{
+    $env = loadDotEnv(dirname(__DIR__, 4) . '/.env');
+    $flag = strtolower((string) ($env['PM_INSECURE'] ?? getenv('PM_INSECURE') ?: ''));
+    if (in_array('--insecure', $GLOBALS['argv'] ?? [], true) || in_array($flag, ['1', 'true', 'yes'], true)) {
+        fwrite(STDERR, "Warning: TLS verification is disabled (--insecure or PM_INSECURE).\n");
+
+        return [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => 0];
+    }
+
+    $bundle = (string) ($env['PM_CA_BUNDLE'] ?? getenv('PM_CA_BUNDLE') ?: getenv('CURL_CA_BUNDLE') ?: '');
+
+    return $bundle !== '' && is_file($bundle) ? [CURLOPT_CAINFO => $bundle] : [];
+}
+
+/**
+ * Updating an existing asset needs a version name; say so instead of only printing the raw 422.
+ */
+function printVersionNameHint(string $body): void
+{
+    if (stripos($body, 'version name') !== false) {
+        fwrite(STDERR, "Hint: this asset already exists, so an update needs --version-name \"short change summary\".\n");
+    }
 }

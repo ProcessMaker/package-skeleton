@@ -22,7 +22,7 @@ $envPath = $projectRoot . '/.env';
 [$yamlFile, $hostOverride, $tokenOverride, $versionName] = parseCliArgs(array_slice($argv, 1));
 
 if ($yamlFile === null) {
-    fwrite(STDERR, "Usage: php upsert-screen.php path/to/screen.yaml [--host URL] [--token TOKEN] [--version-name TEXT]\n");
+    fwrite(STDERR, "Usage: php upsert-screen.php path/to/screen.yaml [--host URL] [--token TOKEN] [--version-name TEXT] [--insecure]\n");
     exit(1);
 }
 
@@ -69,7 +69,7 @@ if ($versionName !== null && $versionName !== '') {
 $payload = json_encode($body, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
 $ch = curl_init($url);
-curl_setopt_array($ch, [
+curl_setopt_array($ch, tlsOptions() + [
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => $payload,
     CURLOPT_RETURNTRANSFER => true,
@@ -84,7 +84,6 @@ curl_setopt_array($ch, [
 $body = curl_exec($ch);
 $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $error = curl_error($ch);
-curl_close($ch);
 
 if ($body === false) {
     fwrite(STDERR, "Request failed: {$error}\n");
@@ -95,6 +94,7 @@ $data = json_decode($body, true);
 if (!is_array($data) || empty($data['success'])) {
     fwrite(STDERR, "HTTP {$status} from {$url}\n");
     fwrite(STDERR, $body . "\n");
+    printVersionNameHint((string) $body);
     exit(1);
 }
 
@@ -187,4 +187,37 @@ function loadDotEnv(string $path): array
     }
 
     return $vars;
+}
+
+/**
+ * TLS options for a local HTTPS instance with a self-signed or private CA.
+ *
+ * --insecure or PM_INSECURE=1 skips verification (local development only).
+ * PM_CA_BUNDLE or CURL_CA_BUNDLE points to a CA file and keeps verification on.
+ *
+ * @return array<int, mixed>
+ */
+function tlsOptions(): array
+{
+    $env = loadDotEnv(dirname(__DIR__, 4) . '/.env');
+    $flag = strtolower((string) ($env['PM_INSECURE'] ?? getenv('PM_INSECURE') ?: ''));
+    if (in_array('--insecure', $GLOBALS['argv'] ?? [], true) || in_array($flag, ['1', 'true', 'yes'], true)) {
+        fwrite(STDERR, "Warning: TLS verification is disabled (--insecure or PM_INSECURE).\n");
+
+        return [CURLOPT_SSL_VERIFYPEER => false, CURLOPT_SSL_VERIFYHOST => 0];
+    }
+
+    $bundle = (string) ($env['PM_CA_BUNDLE'] ?? getenv('PM_CA_BUNDLE') ?: getenv('CURL_CA_BUNDLE') ?: '');
+
+    return $bundle !== '' && is_file($bundle) ? [CURLOPT_CAINFO => $bundle] : [];
+}
+
+/**
+ * Updating an existing asset needs a version name; say so instead of only printing the raw 422.
+ */
+function printVersionNameHint(string $body): void
+{
+    if (stripos($body, 'version name') !== false) {
+        fwrite(STDERR, "Hint: this asset already exists, so an update needs --version-name \"short change summary\".\n");
+    }
 }
